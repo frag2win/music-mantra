@@ -16,6 +16,14 @@
  *   - conf: confidence = 1 − aperiodicity (0–1, higher = more confident)
  */
 
+// ─── AudioWorklet Globals Declarations ───────────────────────────────────────
+declare var sampleRate: number;
+declare class AudioWorkletProcessor {
+  readonly port: MessagePort;
+  process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): boolean;
+}
+declare function registerProcessor(name: string, processorCtor: any): void;
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 const DEFAULT_WINDOW_SIZE = 2048;
 const DEFAULT_THRESHOLD = 0.15;
