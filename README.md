@@ -1,7 +1,7 @@
 # Music Mantra — Swara Healing (Web)
 
-[![Version](https://img.shields.io/badge/version-0.2--draft-blue.svg)](TRD-swara-healing-web.md)
-[![Status](https://img.shields.io/badge/status-for--review-orange.svg)](TRD-swara-healing-web.md)
+[![Version](https://img.shields.io/badge/version-0.2--draft-blue.svg)](DOCS/TRD-swara-healing-web.md)
+[![Status](https://img.shields.io/badge/status-for--review-orange.svg)](DOCS/TRD-swara-healing-web.md)
 [![Platform](https://img.shields.io/badge/platform-Web--Browser-green.svg)](#platform-requirements)
 [![Privacy](https://img.shields.io/badge/privacy-Client--side%20DSP-brightgreen.svg)](#security-privacy--compliance)
 
