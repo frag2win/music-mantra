@@ -16,9 +16,7 @@ export const SunPulse: React.FC<SunPulseProps> = ({
   showGuideText = true,
   variant = 'inline',
 }) => {
-  const { theme, animationIntensity } = useTheme();
-  const isAnimated = animationIntensity !== 'off';
-  const isSubtle = animationIntensity === 'subtle';
+  const { theme } = useTheme();
   const isFullscreen = variant === 'fullscreen';
 
   // Smooth, organic 10-petal lotus path calculation
@@ -60,10 +58,6 @@ export const SunPulse: React.FC<SunPulseProps> = ({
     return paths;
   }, []);
 
-  const fsSize = 'max(130vw, 130vh)';
-  const keyId = 'manipura';
-  const spinDuration = isSubtle ? 70 : 50; // Slower, calm, unhurried spin
-
   return (
     <div
       style={
@@ -90,58 +84,35 @@ export const SunPulse: React.FC<SunPulseProps> = ({
       }
       aria-label="Manipura Solar Resonance"
     >
-      <style>{`
-        @keyframes ${keyId}Spin {
-          from { transform: translate(-50%, -50%) rotate(0deg); }
-          to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        @keyframes ${keyId}InlineSpin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes ${keyId}SolarGlow {
-          0%, 100% { opacity: ${isSubtle ? 0.25 : 0.40}; transform: scale(0.98); }
-          50% { opacity: ${isSubtle ? 0.45 : 0.65}; transform: scale(1.02); }
-        }
-      `}</style>
-
       {/* Gentle ambient solar glow */}
       {isFullscreen && (
         <div
-          className={isAnimated ? 'chakra-animated' : ''}
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
             background: `radial-gradient(circle at 50% 50%, ${theme.accent}35 0%, ${theme.accentSoft} 30%, transparent 68%)`,
-            animation: isAnimated ? `${keyId}SolarGlow 9s ease-in-out infinite` : 'none',
+            animation: 'chakraAmbientGlow 9s ease-in-out infinite',
             willChange: 'opacity, transform',
           }}
         />
       )}
 
-      {/* Clean, smoothly rotating 10-petal chakra */}
+      {/* Clean, smoothly rotating 10-petal chakra — guaranteed continuous rotation via global CSS */}
       <div
-        className={isAnimated ? 'chakra-animated' : ''}
+        className={isFullscreen ? 'chakra-spin-fullscreen' : 'chakra-spin-inline'}
         style={{
-          position: 'absolute',
-          top: isFullscreen ? '50%' : '5%',
-          left: isFullscreen ? '50%' : '5%',
-          width: isFullscreen ? fsSize : '90%',
-          height: isFullscreen ? fsSize : '90%',
-          transform: isFullscreen ? 'translate(-50%, -50%)' : 'none',
-          animation: isAnimated
-            ? `${isFullscreen ? `${keyId}Spin` : `${keyId}InlineSpin`} ${spinDuration}s linear infinite`
-            : 'none',
-          willChange: 'transform',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <svg
           width="100%"
           height="100%"
           viewBox="0 0 100 100"
-          style={{ opacity: isFullscreen ? (isSubtle ? 0.22 : 0.38) : 0.65 }}
+          style={{ opacity: isFullscreen ? 0.38 : 0.65 }}
           aria-hidden="true"
         >
           {/* Outer Thin Halo Ring */}
@@ -154,7 +125,7 @@ export const SunPulse: React.FC<SunPulseProps> = ({
               d={d}
               fill={`${theme.accent}16`}
               stroke={theme.accent}
-              strokeWidth={isFullscreen ? '0.5' : '0.9'}
+              strokeWidth={isFullscreen ? '0.55' : '0.9'}
               strokeLinejoin="round"
             />
           ))}
@@ -199,7 +170,7 @@ export const SunPulse: React.FC<SunPulseProps> = ({
           <div style={{ fontSize: '1.1rem', marginBottom: '0.15rem' }}>☀️</div>
           <div style={{ fontWeight: 700 }}>Manipura Solar Resonance</div>
           <div style={{ fontSize: '0.72rem', color: '#fde68a', marginTop: '0.15rem' }}>
-            {animationIntensity === 'off' ? 'Still Backdrop' : 'Grounded Warmth · Swara Ga'}
+            Grounded Warmth · Swara Ga
           </div>
         </div>
       )}

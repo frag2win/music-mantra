@@ -40,13 +40,89 @@ body {
   transition: background 0.7s ease, background-color 0.7s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *:not(.chakra-animated):not(.chakra-animated *) {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+/* ==========================================================================
+   Permanent GPU-Accelerated Chakra Spin & Ambient Animation System
+   Defined globally so React reconciliation/re-renders never reset rotation.
+   ========================================================================== */
+
+@keyframes chakraSlowSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
   }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes chakraSlowSpinInline {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes chakraAmbientGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes anahataBreathCycle {
+  0% {
+    opacity: 0.25;
+    transform: scale(0.97);
+  }
+  36.36% {
+    opacity: 0.65;
+    transform: scale(1.02);
+  }
+  45.45% {
+    opacity: 0.65;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0.25;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes vishuddhaAcousticRipple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+}
+
+.chakra-spin-fullscreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(130vw, 130vh);
+  height: max(130vw, 130vh);
+  transform: translate(-50%, -50%);
+  animation: chakraSlowSpin 60s linear infinite !important;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.chakra-spin-inline {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  animation: chakraSlowSpinInline 60s linear infinite !important;
+  will-change: transform;
+  pointer-events: none;
 }
 
 
