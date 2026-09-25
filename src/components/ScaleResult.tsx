@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ScaleDetectionResult } from '../audio/scale-detector';
+import { AlertTriangleIcon } from './common/Icons';
 
 interface ScaleResultProps {
   scaleResult: ScaleDetectionResult | null;
@@ -97,8 +98,9 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
 
         {/* Low Confidence Warning (FR-3 / §6.4) */}
         {scaleResult.lowConfidence && (
-          <div style={{ marginTop: '1rem', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid var(--warning)', padding: '0.75rem', borderRadius: '6px', color: '#fcd34d', fontSize: '0.85rem' }}>
-            ⚠️ Detection confidence is below 60%. You can manually pick your preferred Sa note below or use the 4s Hold feature.
+          <div style={{ marginTop: '1rem', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid var(--warning)', padding: '0.75rem', borderRadius: '6px', color: '#fcd34d', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <AlertTriangleIcon size={16} />
+            <span>Detection confidence is below 60%. You can manually pick your preferred Sa note below or use the 4s Hold feature.</span>
           </div>
         )}
       </div>

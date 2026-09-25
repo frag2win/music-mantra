@@ -3,6 +3,7 @@ import { detectScale, type ScaleDetectionResult, type PitchFrame } from '../audi
 import { AudioEngine } from '../audio/audio-engine';
 import { evaluateSaHold } from '../audio/sa-hold';
 import { useI18n } from '../i18n/I18nContext';
+import { CheckIcon, ClockIcon } from './common/Icons';
 
 interface SingProps {
   saHoldEnabled?: boolean;
@@ -183,9 +184,20 @@ export const Sing: React.FC<SingProps> = ({
               fontSize: '0.85rem',
               fontWeight: 600,
               color: isStable ? 'var(--success)' : 'var(--warning)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
             }}
           >
-            {isStable ? `✓ ${t('sing.steadyBadge')}` : `⏳ ${t('sing.unvoicedBadge')}`}
+            {isStable ? (
+              <>
+                <CheckIcon size={14} /> {t('sing.steadyBadge')}
+              </>
+            ) : (
+              <>
+                <ClockIcon size={14} /> {t('sing.unvoicedBadge')}
+              </>
+            )}
           </div>
         )}
       </div>
@@ -227,11 +239,15 @@ export const Sing: React.FC<SingProps> = ({
       </div>
 
       <div style={{ maxWidth: '450px', margin: '0 auto 2rem auto', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-        {voicedTargetMet
-          ? '✓ Sufficient vocal frames captured! You may click Finish or let the timer complete.'
-          : saHoldEnabled
-            ? 'Hold your voice steady without wavering...'
-            : 'Sing a melody naturally so we can detect your tonic (Sa) pitch...'}
+        {voicedTargetMet ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)' }}>
+            <CheckIcon size={14} /> Sufficient vocal frames captured! You may click Finish or let the timer complete.
+          </span>
+        ) : saHoldEnabled ? (
+          'Hold your voice steady without wavering...'
+        ) : (
+          'Sing a melody naturally so we can detect your tonic (Sa) pitch...'
+        )}
       </div>
 
       <button

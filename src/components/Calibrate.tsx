@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import type { CalibrationResult } from '../audio/calibration';
 import { AudioEngine } from '../audio/audio-engine';
 import { useI18n } from '../i18n/I18nContext';
+import { AlertTriangleIcon, CheckCircleIcon } from './common/Icons';
 
 interface CalibrateProps {
   onCalibrationDone: (result: CalibrationResult) => void;
@@ -107,12 +108,14 @@ export const Calibrate: React.FC<CalibrateProps> = ({
           </div>
 
           {calibrationResult.tooNoisy ? (
-            <div style={{ marginTop: '1rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid var(--danger)', padding: '0.75rem', borderRadius: '6px', color: '#fca5a5' }}>
-              ⚠️ Room background noise is too high ({(calibrationResult.noiseP95 * 1000).toFixed(1)} mRMS &gt; 50 mRMS limit). Please move to a quieter room and try again.
+            <div style={{ marginTop: '1rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid var(--danger)', padding: '0.75rem', borderRadius: '6px', color: '#fca5a5', display: 'flex', alignItems: 'center' }}>
+              <AlertTriangleIcon size={18} style={{ marginRight: '0.5rem', color: 'var(--danger)', flexShrink: 0 }} />
+              <span>Room background noise is too high ({(calibrationResult.noiseP95 * 1000).toFixed(1)} mRMS &gt; 50 mRMS limit). Please move to a quieter room and try again.</span>
             </div>
           ) : (
-            <div style={{ marginTop: '1rem', color: 'var(--success)', fontWeight: 600, textAlign: 'center' }}>
-              ✓ Room noise floor is quiet and calibrated successfully!
+            <div style={{ marginTop: '1rem', color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircleIcon size={18} style={{ marginRight: '0.5rem', color: 'var(--success)', flexShrink: 0 }} />
+              <span>Room noise floor is quiet and calibrated successfully!</span>
             </div>
           )}
         </div>

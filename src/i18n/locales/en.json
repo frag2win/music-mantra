@@ -38,7 +38,7 @@
     "tagline": "Daily acoustic resonance therapy designed to align your body's chakras through sacred mantra vibrations.",
     "ageDeclaration": "I declare that I am 18 years of age or older and agree to guided acoustic wellness practice.",
     "beginBtn": "Begin Today's Practice",
-    "downloadCalendar": "📅 Download 45-Day .ics Schedule",
+    "downloadCalendar": "Download 45-Day .ics Schedule",
     "privacyNote": "Your voice audio stays 100% private in your browser. We never record or transmit your speech."
   },
   "calibrate": {
@@ -69,12 +69,12 @@
   "listen": {
     "title": "Step 4: Listen to Reference Mantra",
     "seedMantra": "SEED MANTRA & TARGET SWARA",
-    "playBtn": "▶ Play Reference Mantra Loop",
-    "stopBtn": "⏹ Stop Mantra Playback",
-    "loading": "⏳ Loading Audio...",
-    "playingMsg": "🎵 Playing gapless reference audio... Listen closely to pitch and tone.",
+    "playBtn": "Play Reference Mantra Loop",
+    "stopBtn": "Stop Mantra Playback",
+    "loading": "Loading Audio...",
+    "playingMsg": "Playing gapless reference audio... Listen closely to pitch and tone.",
     "idleMsg": "Click to listen to the mantra audio loop.",
-    "halfDuplex": "🔒 Half-duplex Safety: Microphone is stopped during playback to eliminate speaker feedback.",
+    "halfDuplex": "Half-duplex Safety: Microphone is stopped during playback to eliminate speaker feedback.",
     "goAheadBtn": "Go Ahead and Start Chanting",
     "changeConditionBtn": "Change Condition"
   },
@@ -99,7 +99,7 @@
     "celebration": "Wonderful resonance! You have completed Day {day} of your 45-day journey.",
     "meanAccuracy": "Overall Accuracy: {acc}%",
     "totalVoiced": "Active Voiced Time: {min} minutes",
-    "calendarRemind": "📅 Download Calendar Schedule (.ics)",
+    "calendarRemind": "Download Calendar Schedule (.ics)",
     "homeBtn": "Back to Home"
   },
   "languages": {

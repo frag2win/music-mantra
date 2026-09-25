@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import en from './locales/en.json';
 import hi from './locales/hi.json';
 import mr from './locales/mr.json';
+import { GlobeIcon } from '../components/common/Icons';
 
 export type Locale = 'en' | 'hi' | 'mr';
 
@@ -102,7 +103,7 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
       role="region"
       aria-label="Language selection"
     >
-      <span style={{ fontSize: '0.9rem' }} aria-hidden="true">🌐</span>
+      <GlobeIcon size={15} color="var(--text-secondary)" />
       <select
         value={locale}
         onChange={(e) => setLocale(e.target.value as Locale)}

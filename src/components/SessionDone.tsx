@@ -3,6 +3,7 @@ import type { SessionRecord } from '../types';
 import { CONDITION_DETAILS } from '../types';
 import { apiClient } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
+import { SparklesIcon, CalendarIcon } from './common/Icons';
 
 interface SessionDoneProps {
   session: SessionRecord | null;
@@ -24,7 +25,9 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
 
   return (
     <div className="session-done-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>🎉</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <SparklesIcon size={52} color="var(--success)" />
+      </div>
       <h2 style={{ color: 'var(--success)', marginBottom: '0.5rem', fontSize: '2rem' }}>
         {t('sessionDone.title')}
       </h2>
@@ -88,11 +91,12 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
         </button>
         <button
           className="btn-secondary"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
           onClick={() => {
             apiClient.downloadCalendar(detail?.name || 'Swara Healing');
           }}
         >
-          📅 Download 45-Day Calendar (.ics)
+          <CalendarIcon size={16} /> Download 45-Day Calendar (.ics)
         </button>
         <button className="btn-secondary" onClick={onViewHistory}>
           View History Log

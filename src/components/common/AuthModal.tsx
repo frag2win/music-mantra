@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient, type UserProfile, type ProgramData } from '../../api/client';
+import { CloseIcon, DownloadIcon, TrashIcon, BoltIcon } from './Icons';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -100,7 +101,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthCha
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('⚠️ Are you sure you want to permanently delete your account and all 45-day program data? This action complies with DPDP Act 2023 and cannot be undone.')) {
+    if (!window.confirm('Are you sure you want to permanently delete your account and all 45-day program data? This action complies with DPDP Act 2023 and cannot be undone.')) {
       return;
     }
 
@@ -150,9 +151,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthCha
             color: 'var(--text-secondary)',
             fontSize: '1.25rem',
             cursor: 'pointer',
+            padding: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
+          aria-label="Close modal"
         >
-          ✕
+          <CloseIcon size={18} />
         </button>
 
         <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
@@ -196,15 +202,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthCha
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <button className="btn-secondary" onClick={handleExportData}>
-                📥 Export My Data (JSON — DPDP Act)
+              <button className="btn-secondary" onClick={handleExportData} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                <DownloadIcon size={16} /> Export My Data (JSON — DPDP Act)
               </button>
               <button
                 className="btn-secondary"
-                style={{ borderColor: 'var(--danger)', color: '#fca5a5' }}
+                style={{ borderColor: 'var(--danger)', color: '#fca5a5', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                 onClick={handleDeleteAccount}
               >
-                🗑️ Delete Account & All Data
+                <TrashIcon size={16} /> Delete Account & All Data
               </button>
               <button className="btn-primary" onClick={handleSignOut} style={{ marginTop: '0.5rem' }}>
                 Sign Out
@@ -241,8 +247,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthCha
 
             {devToken && (
               <div style={{ background: '#0f172a', border: '1px dashed var(--accent-primary)', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', display: 'block', marginBottom: '0.5rem' }}>
-                  ⚡ Quick Dev Sign-In
+                <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem' }}>
+                  <BoltIcon size={14} /> Quick Dev Sign-In
                 </span>
                 <button
                   type="button"

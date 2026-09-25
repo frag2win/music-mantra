@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useOptionalTheme } from '../../theme/ThemeContext';
+import { TargetIcon, StarIcon, MicIcon, ArrowUpIcon, ArrowDownIcon } from './Icons';
 
 interface PitchMeterProps {
   currentAccuracy: number; // 0..100
@@ -58,14 +59,14 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
   const isSharp = centError > 20;
 
   const statusBadge = isResonant
-    ? { icon: '★', label: 'IN TUNE', desc: 'Resonance Lock Reached (≥90%)' }
+    ? { icon: <StarIcon size={14} filled />, label: 'IN TUNE', desc: 'Resonance Lock Reached (≥90%)' }
     : isNear
-      ? { icon: '◉', label: 'NEAR TUNE', desc: 'Approaching Resonance — Steady Breath' }
+      ? { icon: <TargetIcon size={14} />, label: 'NEAR TUNE', desc: 'Approaching Resonance — Steady Breath' }
       : isFlat
-        ? { icon: '▲', label: 'FLAT', desc: 'Gently Raise Pitch Upward' }
+        ? { icon: <ArrowUpIcon size={14} />, label: 'FLAT', desc: 'Gently Raise Pitch Upward' }
         : isSharp
-          ? { icon: '▼', label: 'SHARP', desc: 'Gently Ease Pitch Downward' }
-          : { icon: '◆', label: 'ADJUSTING', desc: 'Sing Into Microphone' };
+          ? { icon: <ArrowDownIcon size={14} />, label: 'SHARP', desc: 'Gently Ease Pitch Downward' }
+          : { icon: <MicIcon size={14} />, label: 'ADJUSTING', desc: 'Sing Into Microphone' };
 
   return (
     <div className="pitch-meter card" style={{ textAlign: 'center', margin: '1rem 0' }}>
@@ -115,7 +116,7 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
           }}
           aria-label={`Pitch status: ${statusBadge.label}`}
         >
-          <span aria-hidden="true" style={{ fontSize: '0.9rem' }}>{statusBadge.icon}</span>
+          <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center' }}>{statusBadge.icon}</span>
           <span>[{statusBadge.label}]</span>
         </span>
       </div>
@@ -187,11 +188,11 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        <span>◀ -100¢ [FLAT]</span>
-        <span style={{ color: isResonant ? activeColor : 'var(--text-primary)', fontWeight: 700 }}>
-          🎯 Target Swara [0¢]
+        <span>-100¢ [FLAT]</span>
+        <span style={{ color: isResonant ? activeColor : 'var(--text-primary)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+          <TargetIcon size={14} /> Target Swara [0¢]
         </span>
-        <span>+100¢ [SHARP] ▶</span>
+        <span>+100¢ [SHARP]</span>
       </div>
 
       {/* Real-time Directional Coaching (avoids red alert stress cues) */}
@@ -226,16 +227,26 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
       >
         {currentHz ? (
           isResonant ? (
-            <span>★ Harmonic Lock! Resonating smoothly with the target swara.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <StarIcon size={16} filled /> Harmonic Lock! Resonating smoothly with the target swara.
+            </span>
           ) : isFlat ? (
-            <span>▲ Pitch is flat. Raise your vocal tone gently upward.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <ArrowUpIcon size={15} /> Pitch is flat. Raise your vocal tone gently upward.
+            </span>
           ) : isSharp ? (
-            <span>▼ Pitch is sharp. Ease your vocal tone gently downward.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <ArrowDownIcon size={15} /> Pitch is sharp. Ease your vocal tone gently downward.
+            </span>
           ) : (
-            <span>◉ Almost in tune! Steady your breath in the target zone.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <TargetIcon size={15} /> Almost in tune! Steady your breath in the target zone.
+            </span>
           )
         ) : (
-          <span>🎙️ Chant the mantra into your microphone to begin feedback...</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+            <MicIcon size={16} /> Chant the mantra into your microphone to begin feedback...
+          </span>
         )}
       </div>
 

@@ -21,8 +21,8 @@ describe('Phase 2: RFC 5545 iCalendar Generator', () => {
     expect(veventMatches?.length).toBe(45);
 
     // Verify Day 1 and Day 45 summaries
-    expect(ics).toContain('SUMMARY:🧘 Music Mantra — Day 1 of 45 (Diabetes (Manipura Chakra))');
-    expect(ics).toContain('SUMMARY:🧘 Music Mantra — Day 45 of 45 (Diabetes (Manipura Chakra))');
+    expect(ics).toContain('SUMMARY:Music Mantra — Day 1 of 45 (Diabetes (Manipura Chakra))');
+    expect(ics).toContain('SUMMARY:Music Mantra — Day 45 of 45 (Diabetes (Manipura Chakra))');
 
     // Verify reminder alarm exists
     expect(ics).toContain('BEGIN:VALARM');

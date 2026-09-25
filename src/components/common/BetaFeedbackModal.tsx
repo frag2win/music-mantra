@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collectDeviceDiagnostics, type DeviceDiagnostics } from '../../utils/diagnostics';
+import { CloseIcon, FlaskIcon, SmartphoneIcon, AlertTriangleIcon, LotusIcon, StarIcon } from './Icons';
 
 interface BetaFeedbackModalProps {
   isOpen: boolean;
@@ -100,13 +101,19 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
             color: 'var(--text-secondary)',
             fontSize: '1.25rem',
             cursor: 'pointer',
+            padding: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
+          aria-label="Close modal"
         >
-          ✕
+          <CloseIcon size={18} />
         </button>
 
-        <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
-          🧪 Phase 3 Beta Feedback & Diagnostics
+        <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <FlaskIcon size={20} />
+          <span>Phase 3 Beta Feedback & Diagnostics</span>
         </h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
           Help us calibrate scale detection accuracy and validate device performance.
@@ -115,8 +122,9 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
         {/* Device Capabilities Audit */}
         {diagnostics && (
           <div style={{ background: '#0f172a', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
-            <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', borderBottom: '1px solid #334155', paddingBottom: '0.25rem' }}>
-              📱 DEVICE CAPABILITY AUDIT
+            <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', borderBottom: '1px solid #334155', paddingBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <SmartphoneIcon size={16} />
+              <span>DEVICE CAPABILITY AUDIT</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <div>OS: <strong>{diagnostics.os}</strong></div>
@@ -124,14 +132,27 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
               <div>AudioWorklet: <strong style={{ color: diagnostics.audioWorkletSupported ? 'var(--success)' : 'var(--danger)' }}>{diagnostics.audioWorkletSupported ? 'Supported' : 'Unavailable'}</strong></div>
               <div>Wake Lock: <strong style={{ color: diagnostics.wakeLockSupported ? 'var(--success)' : 'var(--warning)' }}>{diagnostics.wakeLockSupported ? 'Supported' : 'Unavailable'}</strong></div>
               <div>Audio Sample Rate: <strong>{diagnostics.sampleRate ? `${diagnostics.sampleRate} Hz` : 'N/A'}</strong></div>
-              <div>Bluetooth Warning: <strong>{diagnostics.isNarrowband ? '⚠️ Narrowband' : 'Clean (≥16kHz)'}</strong></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <span>Bluetooth Warning:</span>
+                <strong>
+                  {diagnostics.isNarrowband ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', color: 'var(--warning)' }}>
+                      <AlertTriangleIcon size={14} /> Narrowband
+                    </span>
+                  ) : (
+                    'Clean (≥16kHz)'
+                  )}
+                </strong>
+              </div>
             </div>
           </div>
         )}
 
         {submitted ? (
           <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🙏</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+              <LotusIcon size={44} color="var(--accent-primary)" />
+            </div>
             <h3 style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>Thank You!</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               Your field feedback has been submitted to the research metrics repository.
@@ -161,13 +182,15 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
                     style={{
                       background: 'none',
                       border: 'none',
-                      fontSize: '1.5rem',
                       cursor: 'pointer',
                       color: star <= rating ? '#fbbf24' : '#475569',
-                      padding: 0,
+                      padding: '0.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
+                    aria-label={`${star} star`}
                   >
-                    ★
+                    <StarIcon size={22} filled={star <= rating} color={star <= rating ? '#fbbf24' : '#475569'} />
                   </button>
                 ))}
               </div>

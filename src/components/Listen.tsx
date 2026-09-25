@@ -3,6 +3,7 @@ import type { HealthCondition } from '../types';
 import { CONDITION_DETAILS } from '../types';
 import { AudioEngine } from '../audio/audio-engine';
 import { useI18n } from '../i18n/I18nContext';
+import { AlertTriangleIcon, PlayIcon, StopIcon, ClockIcon, MusicNoteIcon, LockIcon } from './common/Icons';
 
 interface ListenProps {
   condition: HealthCondition;
@@ -145,22 +146,43 @@ export const Listen: React.FC<ListenProps> = ({
           onClick={handleTogglePlayback}
           disabled={isLoading}
         >
-          {isLoading ? t('listen.loading') : isPlaying ? t('listen.stopBtn') : t('listen.playBtn')}
+          {isLoading ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ClockIcon size={18} /> {t('listen.loading')}
+            </span>
+          ) : isPlaying ? (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <StopIcon size={18} /> {t('listen.stopBtn')}
+            </span>
+          ) : (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <PlayIcon size={18} /> {t('listen.playBtn')}
+            </span>
+          )}
         </button>
 
         {playbackError && (
-          <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginTop: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '6px' }}>
-            ⚠️ {playbackError}
+          <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginTop: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+            <AlertTriangleIcon size={14} />
+            <span>{playbackError}</span>
           </div>
         )}
 
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
-          {isPlaying ? t('listen.playingMsg') : t('listen.idleMsg')}
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem' }}>
+          {isPlaying ? (
+            <>
+              <MusicNoteIcon size={16} color="var(--chakra-theme-accent, var(--accent-primary))" />
+              <span>{t('listen.playingMsg')}</span>
+            </>
+          ) : (
+            <span>{t('listen.idleMsg')}</span>
+          )}
         </div>
       </div>
 
-      <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid var(--accent-primary)', padding: '0.75rem', borderRadius: '8px', maxWidth: '550px', margin: '0 auto 2rem auto', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-        {t('listen.halfDuplex')}
+      <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid var(--accent-primary)', padding: '0.75rem 1rem', borderRadius: '8px', maxWidth: '550px', margin: '0 auto 2rem auto', fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+        <LockIcon size={16} color="var(--accent-primary)" />
+        <span>{t('listen.halfDuplex')}</span>
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>

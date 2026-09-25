@@ -1,4 +1,5 @@
 import React from 'react';
+import { TargetIcon } from './common/Icons';
 
 interface RetryProps {
   evalAccuracy: number;
@@ -8,7 +9,9 @@ interface RetryProps {
 export const Retry: React.FC<RetryProps> = ({ evalAccuracy, onAcknowledgeRetry }) => {
   return (
     <div className="retry-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🎯</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <TargetIcon size={48} color="var(--warning)" />
+      </div>
       <h2 style={{ color: 'var(--warning)', marginBottom: '0.5rem' }}>
         Accuracy Evaluation Not Met
       </h2>

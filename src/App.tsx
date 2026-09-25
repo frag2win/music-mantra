@@ -21,6 +21,8 @@ import { useI18n, LanguageSwitcher } from './i18n/I18nContext';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ChakraBackdrop } from './components/animations/ChakraBackdrop';
 
+import { LotusIcon, FlaskIcon, UserIcon, KeyIcon, WrenchIcon, ScaleIcon } from './components/common/Icons';
+
 export const App: React.FC = () => {
   const { t } = useI18n();
   const [snapshot, send] = useMachine(appMachine);
@@ -49,7 +51,7 @@ export const App: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>🧘</span>
+          <LotusIcon size={28} color="var(--chakra-theme-accent, var(--accent-primary))" />
           <div>
             <h1 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
               {t('app.title')}
@@ -69,27 +71,41 @@ export const App: React.FC = () => {
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowBetaModal(true)}
             title="Inspect device diagnostics and submit beta feedback"
           >
-            🧪 Feedback
+            <FlaskIcon size={14} style={{ marginRight: '0.4rem' }} /> Feedback
           </button>
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowAuthModal(true)}
           >
-            {isAuthenticated ? '👤 Account' : '🔑 Sign In'}
+            {isAuthenticated ? (
+              <>
+                <UserIcon size={14} style={{ marginRight: '0.4rem' }} /> Account
+              </>
+            ) : (
+              <>
+                <KeyIcon size={14} style={{ marginRight: '0.4rem' }} /> Sign In
+              </>
+            )}
           </button>
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowHarness(!showHarness)}
           >
-            {showHarness ? '← Back to App' : '🛠 DSP Harness'}
+            {showHarness ? (
+              '← Back to App'
+            ) : (
+              <>
+                <WrenchIcon size={14} style={{ marginRight: '0.4rem' }} /> DSP Harness
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -315,8 +331,9 @@ export const App: React.FC = () => {
           background: 'rgba(15, 23, 42, 0.6)'
         }}
       >
-        <div style={{ maxWidth: '800px', margin: '0 auto 0.75rem auto', color: '#94a3b8', fontSize: '0.75rem', lineHeight: '1.4' }}>
-          ⚖️ <strong>{t('app.medicalDisclaimer')}</strong>
+        <div style={{ maxWidth: '800px', margin: '0 auto 0.75rem auto', color: '#94a3b8', fontSize: '0.75rem', lineHeight: '1.4', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+          <ScaleIcon size={14} style={{ color: '#94a3b8' }} />
+          <span><strong>{t('app.medicalDisclaimer')}</strong></span>
         </div>
         <div>
           Music Mantra — Swara Healing Web · Client-Side DSP Engine · Confidential & Private

@@ -4,6 +4,7 @@ import { CONDITION_DETAILS } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { useOptionalTheme } from '../theme/ThemeContext';
 import { CHAKRA_THEMES } from '../theme/chakraThemes';
+import { SunIcon, LeafIcon, WaveIcon } from './common/Icons';
 
 interface ConditionMenuProps {
   selectedSaNote: string;
@@ -95,12 +96,13 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '0.9rem',
                       boxShadow: `0 0 8px ${chakraTheme.accent}66`,
                     }}
                     title={`Chakra Geometry: ${chakraTheme.sacredGeometry.type}`}
                   >
-                    {chakraTheme.sacredGeometry.symbol}
+                    {item.id === 'diabetes' && <SunIcon size={16} color="#ffffff" />}
+                    {item.id === 'hypertension' && <LeafIcon size={16} color="#ffffff" />}
+                    {item.id === 'thyroid' && <WaveIcon size={16} color="#ffffff" />}
                   </div>
                 </div>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { apiClient } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
+import { CheckCircleIcon, CalendarIcon } from './common/Icons';
 
 interface WelcomeProps {
   activeDay: number;
@@ -81,8 +82,9 @@ export const Welcome: React.FC<WelcomeProps> = ({
             </button>
           </div>
         ) : (
-          <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid var(--success)', padding: '0.75rem', borderRadius: '8px', color: '#86efac', fontSize: '0.9rem' }}>
-            ✓ Medical Disclaimer Accepted
+          <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid var(--success)', padding: '0.75rem', borderRadius: '8px', color: '#86efac', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <CheckCircleIcon size={16} />
+            <span>Medical Disclaimer Accepted</span>
           </div>
         )}
       </div>
@@ -98,11 +100,12 @@ export const Welcome: React.FC<WelcomeProps> = ({
         </button>
         <button
           className="btn-secondary"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
           onClick={() => {
             apiClient.downloadCalendar('Swara Healing 45-Day Program');
           }}
         >
-          📅 Download 45-Day Schedule (.ics)
+          <CalendarIcon size={16} /> Download 45-Day Schedule (.ics)
         </button>
         <button className="btn-secondary" onClick={onViewHistory}>
           View Session History

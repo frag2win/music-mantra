@@ -3,6 +3,7 @@ import { AudioEngine } from '../audio/audio-engine';
 import { detectScale, type PitchFrame, type ScaleDetectionResult } from '../audio/scale-detector';
 import { centError, frameAccuracy, getTargetFrequency, type Condition } from '../audio/accuracy';
 import type { CalibrationResult } from '../audio/calibration';
+import { MusicNoteIcon, AlertTriangleIcon, MicIcon } from './common/Icons';
 
 /**
  * DSP Test Harness — Phase 0 Deliverable
@@ -124,8 +125,9 @@ export default function DspTestHarness() {
       background: '#0f0f14',
       minHeight: '100vh',
     }}>
-      <h1 style={{ fontSize: '28px', marginBottom: '8px', color: '#a78bfa' }}>
-        🎵 DSP Test Harness
+      <h1 style={{ fontSize: '28px', marginBottom: '8px', color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <MusicNoteIcon size={24} />
+        <span>DSP Test Harness</span>
       </h1>
       <p style={{ color: '#888', marginBottom: '32px' }}>
         Phase 0 — Audio pipeline verification for Music Mantra (Swara Healing)
@@ -139,16 +141,20 @@ export default function DspTestHarness() {
           padding: '12px 16px',
           borderRadius: '8px',
           marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.4rem',
         }}>
-          ⚠️ {error}
+          <AlertTriangleIcon size={16} />
+          <span>{error}</span>
         </div>
       )}
 
       {/* ── Section 1: Microphone ── */}
-      <Section title="1. Microphone Access" status={micGranted ? '✅ Granted' : '⏳ Pending'}>
+      <Section title="1. Microphone Access" status={micGranted ? 'Granted' : 'Pending'}>
         {!micGranted ? (
-          <button onClick={handleRequestMic} style={btnStyle}>
-            🎤 Request Microphone
+          <button onClick={handleRequestMic} style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <MicIcon size={16} /> Request Microphone
           </button>
         ) : (
           <div>
@@ -171,12 +177,12 @@ export default function DspTestHarness() {
       {/* ── Section 2: Calibration ── */}
       <Section
         title="2. Noise-Floor Calibration"
-        status={calibration ? (calibration.tooNoisy ? '⚠️ Too Noisy' : '✅ Done') : '⏳ Pending'}
+        status={calibration ? (calibration.tooNoisy ? 'Too Noisy' : 'Done') : 'Pending'}
       >
         {micGranted && !calibration && (
           <div>
             <button onClick={handleCalibrate} style={btnStyle}>
-              🔇 Start Calibration (3s silence)
+              Start Calibration (3s silence)
             </button>
             {calibProgress > 0 && (
               <div style={{ marginTop: '12px' }}>
@@ -195,8 +201,8 @@ export default function DspTestHarness() {
               <tr><td>Noise Mean (RMS)</td><td>{calibration.noiseMean.toFixed(6)}</td></tr>
               <tr>
                 <td>Environment</td>
-                <td style={{ color: calibration.tooNoisy ? '#ef4444' : '#22c55e' }}>
-                  {calibration.tooNoisy ? '🔴 Too Noisy' : '🟢 Quiet Enough'}
+                <td style={{ color: calibration.tooNoisy ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
+                  {calibration.tooNoisy ? 'Too Noisy' : 'Quiet Enough'}
                 </td>
               </tr>
             </tbody>
@@ -205,17 +211,17 @@ export default function DspTestHarness() {
       </Section>
 
       {/* ── Section 3: Live Pitch ── */}
-      <Section title="3. Live Pitch Detection (YIN)" status={isListening ? '🔴 Recording' : '⏹ Stopped'}>
+      <Section title="3. Live Pitch Detection (YIN)" status={isListening ? 'Recording' : 'Stopped'}>
         {micGranted && calibration && (
           <div>
             <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
               {!isListening ? (
                 <button onClick={handleStartListening} style={btnStyle}>
-                  ▶️ Start Listening
+                  Start Listening
                 </button>
               ) : (
                 <button onClick={handleStopListening} style={{ ...btnStyle, background: '#dc2626' }}>
-                  ⏹ Stop Listening
+                  Stop Listening
                 </button>
               )}
             </div>
@@ -253,11 +259,11 @@ export default function DspTestHarness() {
       </Section>
 
       {/* ── Section 4: Scale Detection ── */}
-      <Section title="4. Scale & Sa Detection" status={scaleResult ? '✅ Detected' : '⏳ Pending'}>
+      <Section title="4. Scale & Sa Detection" status={scaleResult ? 'Detected' : 'Pending'}>
         {micGranted && calibration && (
           <div>
-            <button onClick={handleDetectScale} style={btnStyle}>
-              🎶 Detect Scale from Captured Frames
+            <button onClick={handleDetectScale} style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <MusicNoteIcon size={16} /> Detect Scale from Captured Frames
             </button>
 
             {scaleResult && (
@@ -293,8 +299,12 @@ export default function DspTestHarness() {
                     padding: '10px 14px',
                     borderRadius: '8px',
                     marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
                   }}>
-                    ⚠️ Low confidence — consider singing a longer or more tonal phrase.
+                    <AlertTriangleIcon size={16} />
+                    <span>Low confidence — consider singing a longer or more tonal phrase.</span>
                   </div>
                 )}
 
@@ -326,7 +336,7 @@ export default function DspTestHarness() {
       </Section>
 
       {/* ── Section 5: Accuracy Test ── */}
-      <Section title="5. Live Accuracy Test" status={targetHz ? '✅ Ready' : '⏳ Needs scale detection'}>
+      <Section title="5. Live Accuracy Test" status={targetHz ? 'Ready' : 'Needs scale detection'}>
         {scaleResult && (
           <div>
             <div style={{ marginBottom: '16px' }}>
@@ -383,7 +393,7 @@ export default function DspTestHarness() {
       {micGranted && (
         <div style={{ marginTop: '32px', textAlign: 'center' }}>
           <button onClick={handleDestroy} style={{ ...btnStyle, background: '#6b7280' }}>
-            🧹 Destroy Engine & Release Mic
+            Destroy Engine & Release Mic
           </button>
         </div>
       )}

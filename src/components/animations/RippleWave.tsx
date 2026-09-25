@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../theme/ThemeContext';
+import { WaveIcon } from '../common/Icons';
 
 /**
  * Vishuddha (Throat Chakra) — Minimalist, Smooth 16-Petaled Lotus
@@ -187,7 +188,9 @@ export const RippleWave: React.FC<RippleWaveProps> = ({
             boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
           }}
         >
-          <div style={{ fontSize: '1.1rem', marginBottom: '0.15rem' }}>🔮</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.25rem' }}>
+            <WaveIcon size={20} color={theme.accent} />
+          </div>
           <div style={{ fontWeight: 700 }}>Vishuddha Sound Waves</div>
           <div style={{ fontSize: '0.72rem', color: '#a5f3fc', marginTop: '0.15rem' }}>
             Acoustic Ripples · Swara Pa

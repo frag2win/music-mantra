@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../theme/ThemeContext';
+import { LeafIcon } from '../common/Icons';
 
 /**
  * Anahata (Heart Chakra) — Minimalist, Smooth 12-Petaled Lotus
@@ -177,7 +178,9 @@ export const BreathingLoop: React.FC<BreathingLoopProps> = ({
             boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
           }}
         >
-          <div style={{ fontSize: '1.1rem', marginBottom: '0.15rem' }}>🌿</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.25rem' }}>
+            <LeafIcon size={20} color={theme.accent} />
+          </div>
           <div style={{ fontWeight: 700 }}>Anahata Breath</div>
           <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
             4s Inhale · 1s Hold · 6s Exhale

@@ -56,7 +56,7 @@ export function generate45DayIcsCalendar(options: CalendarOptions = {}): string 
     const endDate = new Date(sessionDate.getTime() + 15 * 60 * 1000); // 15 mins (10 min hold + prep)
 
     const uid = `swara-healing-day-${day}-${sessionDate.getTime()}@musicmantra.internal`;
-    const summary = `🧘 Music Mantra — Day ${day} of 45 (${conditionName})`;
+    const summary = `Music Mantra — Day ${day} of 45 (${conditionName})`;
     const description = `Daily 10-minute guided Swara chanting practice for ${conditionName}. Seed mantra: "${mantra}" (${swar}). Open the app to practice.`;
 
     lines.push(

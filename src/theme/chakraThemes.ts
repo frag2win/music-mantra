@@ -68,7 +68,7 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     motionPreset: 'sun-pulse',
     sacredGeometry: {
       type: 'ten-petal-lotus',
-      symbol: '☀️',
+      symbol: 'solar',
     },
   },
 
@@ -102,7 +102,7 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     motionPreset: 'breathing-circle',
     sacredGeometry: {
       type: 'anahata-hexagram',
-      symbol: '🌿',
+      symbol: 'heart',
     },
   },
 
@@ -136,7 +136,7 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     motionPreset: 'sound-ripple',
     sacredGeometry: {
       type: 'sixteen-petal-lotus',
-      symbol: '🌊',
+      symbol: 'throat',
     },
   },
 };
@@ -166,6 +166,6 @@ export const DEFAULT_NEUTRAL_THEME: ChakraThemeConfig = {
   motionPreset: 'breathing-circle',
   sacredGeometry: {
     type: 'ten-petal-lotus',
-    symbol: '🧘',
+    symbol: 'balance',
   },
 };

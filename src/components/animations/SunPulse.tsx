@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../theme/ThemeContext';
+import { SunIcon } from '../common/Icons';
 
 /**
  * Manipura (Solar Plexus) — Minimalist, Smooth 10-Petaled Lotus
@@ -167,7 +168,9 @@ export const SunPulse: React.FC<SunPulseProps> = ({
             boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
           }}
         >
-          <div style={{ fontSize: '1.1rem', marginBottom: '0.15rem' }}>☀️</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.25rem' }}>
+            <SunIcon size={20} color={theme.accent} />
+          </div>
           <div style={{ fontWeight: 700 }}>Manipura Solar Resonance</div>
           <div style={{ fontSize: '0.72rem', color: '#fde68a', marginTop: '0.15rem' }}>
             Grounded Warmth · Swara Ga
