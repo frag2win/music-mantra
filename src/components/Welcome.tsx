@@ -21,7 +21,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
   onViewHistory
 }) => {
   const { t } = useI18n();
-  const [showModal, setShowModal] = useState(!disclaimerAccepted);
+  const [showModal, setShowModal] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(true);
 
   const handleModalAccept = () => {

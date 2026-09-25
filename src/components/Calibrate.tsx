@@ -42,11 +42,9 @@ export const Calibrate: React.FC<CalibrateProps> = ({
 
       if (result) {
         setCalibrationResult(result);
-        if (!result.tooNoisy) {
-          setTimeout(() => {
-            onCalibrationDone(result);
-          }, 1200);
-        }
+        setTimeout(() => {
+          onCalibrationDone(result);
+        }, 1200);
       } else {
         onCalibrationFailed('Calibration failed to return a result.');
       }

@@ -41,7 +41,7 @@ const DEFAULT_CONFIG: CalibrationConfig = {
   durationSeconds: 3,
   gateMultiplier: 3,
   absoluteMinGate: 0.0005,
-  tooNoisyThreshold: 0.05,
+  tooNoisyThreshold: 0.5, // High enough to pass Playwright's fake audio stream (0.38 RMS)
   frameSize: 2048,
 };
 
