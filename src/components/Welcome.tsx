@@ -134,15 +134,21 @@ export const Welcome: React.FC<WelcomeProps> = ({
               </p>
             </div>
 
-            <div style={{ margin: '1rem 0', background: 'rgba(30, 41, 59, 0.6)', padding: '0.75rem', borderRadius: '8px', border: '1px solid #334155' }}>
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', cursor: 'pointer', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+            <div style={{ margin: '1.25rem 0', background: 'rgba(30, 41, 59, 0.7)', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.25)', backdropFilter: 'blur(8px)' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
                 <input
                   type="checkbox"
                   checked={ageConfirmed}
                   onChange={(e) => setAgeConfirmed(e.target.checked)}
-                  style={{ marginTop: '0.2rem' }}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    accentColor: 'var(--accent-primary)',
+                    cursor: 'pointer',
+                    marginTop: '0.15rem'
+                  }}
                 />
-                <span>
+                <span style={{ lineHeight: '1.4' }}>
                   {t('welcome.ageDeclaration')}
                 </span>
               </label>

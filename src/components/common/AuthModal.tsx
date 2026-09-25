@@ -231,16 +231,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthCha
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  background: '#0f172a',
-                  border: '1px solid #334155',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '10px',
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(148, 163, 184, 0.25)',
                   color: '#f8fafc',
-                  marginBottom: '1rem',
+                  marginBottom: '1.25rem',
                   boxSizing: 'border-box',
+                  outline: 'none',
+                  fontSize: '0.92rem',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.25)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.25)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               />
-              <button type="submit" className="btn-primary" style={{ width: '100%' }} disabled={loading}>
+              <button type="submit" className="btn-primary" style={{ width: '100%', padding: '0.85rem' }} disabled={loading}>
                 {loading ? 'Sending...' : 'Send Passwordless Magic Link'}
               </button>
             </form>

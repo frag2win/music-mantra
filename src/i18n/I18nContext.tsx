@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import en from './locales/en.json';
 import hi from './locales/hi.json';
 import mr from './locales/mr.json';
-import { GlobeIcon } from '../components/common/Icons';
+import { GlobeIcon, ChevronDownIcon, CheckIcon } from '../components/common/Icons';
 
 export type Locale = 'en' | 'hi' | 'mr';
 
@@ -87,41 +87,142 @@ export const useI18n = (): I18nContextType => {
  */
 export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }) => {
   const { locale, setLocale } = useI18n();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const languages: { code: Locale; label: string; nativeName: string }[] = [
+    { code: 'en', label: 'English', nativeName: 'English' },
+    { code: 'hi', label: 'Hindi', nativeName: 'हिन्दी' },
+    { code: 'mr', label: 'Marathi', nativeName: 'मराठी' },
+  ];
+
+  const currentLang = languages.find((l) => l.code === locale) || languages[0];
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   return (
     <div
-      className={className}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.4rem',
-        background: 'rgba(30, 41, 59, 0.7)',
-        padding: '0.25rem 0.6rem',
-        borderRadius: '8px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      }}
+      ref={dropdownRef}
+      className={`custom-dropdown ${className || ''}`}
+      style={{ position: 'relative', display: 'inline-block' }}
       role="region"
       aria-label="Language selection"
     >
-      <GlobeIcon size={15} color="var(--text-secondary)" />
-      <select
-        value={locale}
-        onChange={(e) => setLocale(e.target.value as Locale)}
-        aria-label="Select Application Language"
+      <button
+        type="button"
+        className="custom-dropdown-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
         style={{
-          background: 'transparent',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.45rem',
+          background: isOpen ? 'rgba(30, 41, 59, 0.95)' : 'rgba(30, 41, 59, 0.75)',
+          padding: '0.35rem 0.65rem',
+          borderRadius: '9999px',
+          border: '1px solid rgba(148, 163, 184, 0.25)',
           color: 'var(--text-primary)',
-          border: 'none',
-          fontSize: '0.85rem',
+          fontSize: '0.82rem',
           fontWeight: 600,
           cursor: 'pointer',
-          outline: 'none',
+          transition: 'all 0.2s ease',
+          backdropFilter: 'blur(10px)',
+          boxShadow: isOpen ? '0 0 12px rgba(99, 102, 241, 0.3)' : '0 1px 4px rgba(0, 0, 0, 0.2)',
         }}
       >
-        <option value="en" style={{ background: '#1e293b' }}>English</option>
-        <option value="hi" style={{ background: '#1e293b' }}>हिन्दी (Hindi)</option>
-        <option value="mr" style={{ background: '#1e293b' }}>मराठी (Marathi)</option>
-      </select>
+        <GlobeIcon size={14} color="var(--accent-primary)" />
+        <span>{currentLang.nativeName}</span>
+        <ChevronDownIcon
+          size={12}
+          color="var(--text-secondary)"
+          style={{
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.2s ease',
+          }}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          role="listbox"
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 6px)',
+            right: 0,
+            minWidth: '150px',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid rgba(148, 163, 184, 0.25)',
+            borderRadius: '12px',
+            boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(99, 102, 241, 0.15)',
+            backdropFilter: 'blur(16px)',
+            padding: '0.35rem',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.2rem',
+            animation: 'fadeInMenu 0.15s ease-out',
+          }}
+        >
+          {languages.map((item) => {
+            const isSelected = item.code === locale;
+            return (
+              <button
+                key={item.code}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => {
+                  setLocale(item.code);
+                  setIsOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                  color: isSelected ? 'var(--accent-primary)' : 'var(--text-primary)',
+                  fontSize: '0.82rem',
+                  fontWeight: isSelected ? 700 : 500,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 0.15s ease, color 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSelected) (e.currentTarget.style.background = 'rgba(51, 65, 85, 0.5)');
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) (e.currentTarget.style.background = 'transparent');
+                }}
+              >
+                <span>{item.nativeName} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>({item.label})</span></span>
+                {isSelected && <CheckIcon size={14} color="var(--accent-primary)" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

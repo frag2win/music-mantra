@@ -108,38 +108,51 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
       </div>
 
       {/* Manual Sa Override Selector */}
-      <div style={{ maxWidth: '500px', margin: '0 auto 1.5rem auto', textAlign: 'left' }}>
-        <h3 style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '0.75rem', textAlign: 'center' }}>
+      <div style={{ maxWidth: '540px', margin: '0 auto 1.75rem auto', textAlign: 'left' }}>
+        <h3 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '0.85rem', textAlign: 'center', fontWeight: 600 }}>
           Manual Sa Override (Select any pitch class):
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.65rem' }}>
           {ALL_NOTES.map((note) => {
             const isSelected = note === currentSa;
+            const freq = NOTE_BASE_FREQS[note];
             return (
-              <button
+              <div
                 key={note}
-                className={isSelected ? 'btn-primary' : 'btn-secondary'}
-                style={{ padding: '0.5rem', fontSize: '0.9rem' }}
-                onClick={() => onOverrideSa(note, NOTE_BASE_FREQS[note])}
+                role="button"
+                tabIndex={0}
+                className={`pitch-option-chip ${isSelected ? 'selected' : ''}`}
+                onClick={() => onOverrideSa(note, freq)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOverrideSa(note, freq);
+                  }
+                }}
+                aria-pressed={isSelected}
+                aria-label={`Select tonic key ${note} at ${freq.toFixed(1)} Hertz`}
               >
-                {note}
-              </button>
+                <span className="note-title">{note}</span>
+                <span className="note-freq">{freq.toFixed(0)} Hz</span>
+              </div>
             );
           })}
         </div>
       </div>
 
       {/* Sa Hold Feature Flag Toggle (§6.4) */}
-      <div style={{ margin: '1rem 0 1.5rem 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-        <input
-          type="checkbox"
-          id="saHoldToggle"
-          checked={saHoldEnabled}
-          onChange={onToggleSaHold}
-          style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-        />
-        <label htmlFor="saHoldToggle" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-          Enable 4-Second Single Note Hold mode (sa_hold feature flag)
+      <div style={{ margin: '1.25rem 0 1.75rem 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <label className="toggle-switch" htmlFor="saHoldToggle">
+          <input
+            type="checkbox"
+            id="saHoldToggle"
+            checked={saHoldEnabled}
+            onChange={onToggleSaHold}
+          />
+          <span className="toggle-slider" />
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            Enable 4-Second Single Note Hold mode (sa_hold feature flag)
+          </span>
         </label>
       </div>
 

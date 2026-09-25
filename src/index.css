@@ -136,45 +136,262 @@ body {
   padding: 1rem;
 }
 
+/* ==========================================================================
+   Modern Button, Selector, and Form Systems
+   ========================================================================== */
+
 button {
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: var(--radius);
-  border: none;
+  border: 1px solid transparent;
   padding: 0.75rem 1.5rem;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(0.5);
 }
 
 .btn-primary {
-  background-color: var(--accent-primary);
-  color: white;
+  background: linear-gradient(135deg, var(--chakra-theme-accent, var(--accent-primary)) 0%, var(--chakra-theme-accent-hover, var(--accent-primary-hover)) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.2px;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--accent-primary-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -2px rgba(99, 102, 241, 0.55), 0 0 12px var(--chakra-theme-accent-soft, rgba(99, 102, 241, 0.3)), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  filter: brightness(1.06);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px -1px rgba(99, 102, 241, 0.4);
+  filter: brightness(0.96);
 }
 
 .btn-secondary {
-  background-color: #334155;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.85) 100%);
   color: var(--text-primary);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #475569;
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border-color: rgba(148, 163, 184, 0.45);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 10px rgba(148, 163, 184, 0.15);
+  color: #ffffff;
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .btn-danger {
-  background-color: var(--danger);
+  background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
 }
+
+.btn-danger:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: var(--text-primary);
+  padding: 0.42rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.btn-back:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: var(--chakra-theme-accent, var(--accent-primary));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 12px var(--chakra-theme-accent-soft, rgba(99, 102, 241, 0.25));
+  color: #ffffff;
+  transform: translateX(-2px);
+}
+
+.btn-back svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Global Form Controls: Professional Dropdowns & Selects */
+select, .custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 2.25rem 0.6rem 0.85rem;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+select:hover, .custom-select:hover {
+  border-color: rgba(148, 163, 184, 0.45);
+  background-color: rgba(30, 41, 59, 0.9);
+}
+
+select:focus, .custom-select:focus {
+  outline: none;
+  border-color: var(--chakra-theme-accent, var(--accent-primary));
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 0 12px var(--chakra-theme-accent-soft, rgba(99, 102, 241, 0.2));
+}
+
+select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 0.6rem;
+}
+
+/* Pitch / Swara Option Selection Tile */
+.pitch-option-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.75) 100%);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+  user-select: none;
+}
+
+.pitch-option-chip:hover {
+  border-color: rgba(148, 163, 184, 0.4);
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.75) 0%, rgba(30, 41, 59, 0.85) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pitch-option-chip.selected {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(79, 70, 229, 0.45) 100%);
+  border: 1.5px solid var(--chakra-theme-accent, var(--accent-primary));
+  box-shadow: 0 0 16px var(--chakra-theme-accent-soft, rgba(99, 102, 241, 0.35)), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: scale(1.04);
+}
+
+.pitch-option-chip .note-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.pitch-option-chip .note-freq {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+.pitch-option-chip.selected .note-freq {
+  color: #e0e7ff;
+  font-weight: 600;
+}
+
+/* Modern Pill Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  background-color: #334155;
+  border-radius: 9999px;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.toggle-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--chakra-theme-accent, var(--accent-primary));
+  border-color: var(--chakra-theme-accent, var(--accent-primary));
+  box-shadow: 0 0 12px var(--chakra-theme-accent-soft, rgba(99, 102, 241, 0.4));
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
 
 .card {
   background-color: var(--chakra-theme-card-bg, var(--bg-card));

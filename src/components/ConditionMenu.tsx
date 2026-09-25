@@ -4,7 +4,7 @@ import { CONDITION_DETAILS } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { useOptionalTheme } from '../theme/ThemeContext';
 import { CHAKRA_THEMES } from '../theme/chakraThemes';
-import { SunIcon, LeafIcon, WaveIcon, ArrowLeftIcon } from './common/Icons';
+import { SunIcon, LeafIcon, WaveIcon, ArrowLeftIcon, CheckIcon } from './common/Icons';
 
 interface ConditionMenuProps {
   selectedSaNote: string;
@@ -47,6 +47,7 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
           const chakraTheme = CHAKRA_THEMES[item.id];
           const targetHz = selectedSaHz * item.ratio;
           const isPreviewing = themeContext?.previewCondition === item.id;
+          const isSelected = selectedCondition === item.id;
 
           return (
             <div
@@ -60,13 +61,15 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
               style={{
                 textAlign: 'left',
                 borderLeft: `6px solid ${chakraTheme.accent}`,
-                borderColor: isPreviewing ? chakraTheme.accent : undefined,
+                borderColor: isSelected ? chakraTheme.accent : isPreviewing ? chakraTheme.accent : undefined,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
-                transform: isPreviewing ? 'translateY(-4px)' : 'none',
-                boxShadow: isPreviewing
+                transform: isSelected ? 'scale(1.02)' : isPreviewing ? 'translateY(-4px)' : 'none',
+                boxShadow: isSelected
+                  ? `0 0 24px ${chakraTheme.accentSoft}, 0 12px 28px -6px rgba(0, 0, 0, 0.4)`
+                  : isPreviewing
                   ? `0 12px 28px -6px ${chakraTheme.accentSoft}, 0 0 16px ${chakraTheme.accent}33`
                   : undefined,
                 cursor: 'pointer',
@@ -76,19 +79,38 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
               <div>
                 {/* Header with Chakra Badge and Mini Animated Swatch */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span
-                    style={{
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      padding: '0.25rem 0.6rem',
-                      borderRadius: '12px',
-                      background: chakraTheme.accentSoft,
-                      color: chakraTheme.accent,
-                      border: `1px solid ${chakraTheme.accent}44`,
-                    }}
-                  >
-                    {chakraTheme.chakraName} ({t(`conditions.${item.id}.chakra`)})
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span
+                      style={{
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        padding: '0.25rem 0.6rem',
+                        borderRadius: '12px',
+                        background: chakraTheme.accentSoft,
+                        color: chakraTheme.accent,
+                        border: `1px solid ${chakraTheme.accent}44`,
+                      }}
+                    >
+                      {chakraTheme.chakraName} ({t(`conditions.${item.id}.chakra`)})
+                    </span>
+                    {isSelected && (
+                      <span
+                        style={{
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '9999px',
+                          background: chakraTheme.accent,
+                          color: item.id === 'diabetes' ? '#1c1917' : '#ffffff',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                        }}
+                      >
+                        <CheckIcon size={11} /> Current
+                      </span>
+                    )}
+                  </div>
 
                   {/* Mini Theme Swatch Icon */}
                   <div

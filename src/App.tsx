@@ -136,13 +136,25 @@ export const App: React.FC = () => {
         <div className="app-header-controls">
           <LanguageSwitcher />
 
-          <div style={{ background: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #334155' }}>
+          <div
+            style={{
+              background: 'rgba(30, 41, 59, 0.75)',
+              padding: '0.35rem 0.8rem',
+              borderRadius: '9999px',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              border: '1px solid rgba(148, 163, 184, 0.25)',
+              color: 'var(--text-primary)',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
+            }}
+          >
             {t('app.dayProgress', { day: context.activeDay })}
           </div>
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
+            style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowBetaModal(true)}
             title="Inspect device diagnostics and submit beta feedback"
           >
@@ -151,7 +163,7 @@ export const App: React.FC = () => {
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
+            style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowAuthModal(true)}
           >
             {isAuthenticated ? (
@@ -167,7 +179,7 @@ export const App: React.FC = () => {
 
           <button
             className="btn-secondary"
-            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'inline-flex', alignItems: 'center' }}
+            style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center' }}
             onClick={() => setShowHarness(!showHarness)}
           >
             {showHarness ? (

@@ -294,5 +294,13 @@ export const ArrowLeftIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
+/** Chevron Down (Dropdowns & Selectors) */
+export const ChevronDownIcon: React.FC<IconProps> = (props) => (
+  <svg {...defaultProps(props)}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+
 
 

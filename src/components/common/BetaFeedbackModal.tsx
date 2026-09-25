@@ -198,13 +198,14 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.35rem', fontWeight: 600 }}>
                   Category
                 </label>
                 <select
+                  className="custom-select"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as any)}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', background: '#0f172a', border: '1px solid #334155', color: '#f8fafc' }}
+                  style={{ width: '100%' }}
                 >
                   <option value="accuracy">Pitch Accuracy</option>
                   <option value="audio_quality">Audio / Tone Quality</option>
@@ -215,13 +216,14 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.35rem', fontWeight: 600 }}>
                   Pitch Holding Difficulty
                 </label>
                 <select
+                  className="custom-select"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as any)}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', background: '#0f172a', border: '1px solid #334155', color: '#f8fafc' }}
+                  style={{ width: '100%' }}
                 >
                   <option value="easy">Easy (Natural hold)</option>
                   <option value="moderate">Moderate (Some strain)</option>
@@ -231,7 +233,7 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.35rem', fontWeight: 600 }}>
                 Your Email (Optional, for tester follow-up)
               </label>
               <input
@@ -241,19 +243,29 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  background: '#0f172a',
-                  border: '1px solid #334155',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(148, 163, 184, 0.25)',
                   color: '#f8fafc',
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   boxSizing: 'border-box',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.25)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.25)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               />
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.35rem', fontWeight: 600 }}>
                 Comments & Observations
               </label>
               <textarea
@@ -263,13 +275,24 @@ export const BetaFeedbackModal: React.FC<BetaFeedbackModalProps> = ({ isOpen, on
                 onChange={(e) => setComments(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  background: '#0f172a',
-                  border: '1px solid #334155',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(148, 163, 184, 0.25)',
                   color: '#f8fafc',
-                  fontSize: '0.85rem',
+                  fontSize: '0.88rem',
                   boxSizing: 'border-box',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.25)';
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.25)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               />
             </div>
