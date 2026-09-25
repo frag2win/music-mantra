@@ -40,16 +40,7 @@ export const App: React.FC = () => {
       <ChakraBackdrop variant="fullscreen" />
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Top Navbar */}
-      <header
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '1rem 0',
-          borderBottom: '1px solid #334155',
-          marginBottom: '1.5rem'
-        }}
-      >
+      <header className="app-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <LotusIcon size={28} color="var(--chakra-theme-accent, var(--accent-primary))" />
           <div>
@@ -62,7 +53,7 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="app-header-controls">
           <LanguageSwitcher />
 
           <div style={{ background: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #334155' }}>
