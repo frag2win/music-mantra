@@ -37,6 +37,8 @@ export type AppMachineEvent =
   | { type: 'TOGGLE_SA_HOLD' }
   | { type: 'CONFIRM_SCALE' }
   | { type: 'SELECT_CONDITION'; condition: HealthCondition }
+  | { type: 'CHANGE_CONDITION' }
+  | { type: 'GO_TO_MENU' }
   | { type: 'START_CHANTING' }
   | { type: 'EVAL_UPDATE'; currentAccuracy: number; evalAccuracy: number; voicedSeconds: number }
   | { type: 'EVAL_PASSED'; finalAccuracy: number }
@@ -50,7 +52,8 @@ export type AppMachineEvent =
   | { type: 'RESUME' }
   | { type: 'DISCARD' }
   | { type: 'VIEW_HISTORY' }
-  | { type: 'BACK_TO_APP' };
+  | { type: 'BACK_TO_APP' }
+  | { type: 'GO_BACK' };
 
 export const INITIAL_CONTEXT: AppMachineContext = {
   disclaimerAccepted: false,
@@ -70,7 +73,70 @@ export const INITIAL_CONTEXT: AppMachineContext = {
   errorMessage: undefined
 };
 
-export const appMachine = setup({
+export const VALID_MACHINE_STATES = [
+  'welcome',
+  'mic_permission',
+  'error_mic',
+  'calibrate',
+  'error_calibration',
+  'sing',
+  'scale_result',
+  'menu',
+  'listen',
+  'chant_eval',
+  'retry',
+  'chant_hold',
+  'retry_short',
+  'session_done',
+  'history',
+  'paused'
+] as const;
+
+export type ValidMachineState = typeof VALID_MACHINE_STATES[number];
+
+export function isValidMachineState(state: string): state is ValidMachineState {
+  return VALID_MACHINE_STATES.includes(state as ValidMachineState);
+}
+
+export function canGoBack(state: string): boolean {
+  return state !== 'welcome';
+}
+
+export function getBackDestinationTitle(state: string, context?: AppMachineContext): string {
+  switch (state) {
+    case 'mic_permission':
+    case 'calibrate':
+    case 'error_mic':
+    case 'error_calibration':
+      return 'Back to Welcome';
+    case 'sing':
+      return 'Back to Calibration';
+    case 'scale_result':
+      return 'Back to Sing';
+    case 'menu':
+      return context?.scaleResult ? 'Back to Scale Tuning' : 'Back to Sing';
+    case 'listen':
+      return 'Back to Conditions';
+    case 'chant_eval':
+    case 'retry':
+    case 'chant_hold':
+    case 'retry_short':
+    case 'paused':
+      return 'Back to Mantra Preview';
+    case 'session_done':
+      return 'Back to Conditions';
+    case 'history':
+      return context?.pausedFromState === 'session_done'
+        ? 'Back to Session Summary'
+        : context?.pausedFromState === 'menu'
+        ? 'Back to Conditions'
+        : 'Back to Welcome';
+    default:
+      return 'Back';
+  }
+}
+
+export const appMachineSetup = setup({
   types: {
     context: {} as AppMachineContext,
     events: {} as AppMachineEvent
@@ -131,209 +197,318 @@ export const appMachine = setup({
       holdTimeRemainingSeconds: 600
     })
   }
-}).createMachine({
-  id: 'swaraApp',
-  initial: 'welcome',
-  context: INITIAL_CONTEXT,
-  states: {
-    welcome: {
-      on: {
-        ACCEPT_DISCLAIMER: {
-          actions: 'setDisclaimerAccepted'
-        },
-        START_PROGRAM: {
-          guard: ({ context }) => context.disclaimerAccepted,
-          target: 'mic_permission'
-        },
-        VIEW_HISTORY: {
-          target: 'history'
-        }
-      }
-    },
+});
 
-    mic_permission: {
-      on: {
-        MIC_GRANTED: {
-          target: 'calibrate'
-        },
-        MIC_DENIED: {
-          actions: 'setMicDenied',
-          target: 'error_mic'
-        }
-      }
-    },
+export function createAppMachine(
+  customContext?: AppMachineContext,
+  customInitialState?: string
+) {
+  const initial =
+    customInitialState && isValidMachineState(customInitialState)
+      ? customInitialState
+      : 'welcome';
 
-    error_mic: {
-      on: {
-        RETRY_PERMISSIONS: {
-          target: 'mic_permission'
-        },
-        GO_HOME: {
-          target: 'welcome'
+  return appMachineSetup.createMachine({
+    id: 'swaraApp',
+    initial,
+    context: customContext || INITIAL_CONTEXT,
+    states: {
+      welcome: {
+        on: {
+          ACCEPT_DISCLAIMER: {
+            actions: 'setDisclaimerAccepted'
+          },
+          START_PROGRAM: {
+            guard: ({ context }) => context.disclaimerAccepted,
+            target: 'mic_permission'
+          },
+          VIEW_HISTORY: {
+            actions: assign({ pausedFromState: 'welcome' }),
+            target: 'history'
+          }
         }
-      }
-    },
+      },
 
-    calibrate: {
-      on: {
-        CALIBRATION_DONE: {
-          actions: 'setCalibration',
-          target: 'sing'
-        },
-        CALIBRATION_FAILED: {
-          target: 'error_calibration'
+      mic_permission: {
+        on: {
+          MIC_GRANTED: {
+            target: 'calibrate'
+          },
+          MIC_DENIED: {
+            actions: 'setMicDenied',
+            target: 'error_mic'
+          },
+          GO_BACK: {
+            target: 'welcome'
+          }
         }
-      }
-    },
+      },
 
-    error_calibration: {
-      on: {
-        RETRY_CALIBRATION: {
-          target: 'calibrate'
-        },
-        GO_HOME: {
-          target: 'welcome'
+      error_mic: {
+        on: {
+          RETRY_PERMISSIONS: {
+            target: 'mic_permission'
+          },
+          GO_HOME: {
+            target: 'welcome'
+          },
+          GO_BACK: {
+            target: 'welcome'
+          }
         }
-      }
-    },
+      },
 
-    sing: {
-      entry: 'resetSessionCounters',
-      on: {
-        SINGING_COMPLETE: {
-          actions: 'setScaleResult',
-          target: 'scale_result'
-        },
-        RETRY_SINGING: {
-          target: 'sing'
+      calibrate: {
+        on: {
+          CALIBRATION_DONE: {
+            actions: 'setCalibration',
+            target: 'sing'
+          },
+          CALIBRATION_FAILED: {
+            target: 'error_calibration'
+          },
+          GO_BACK: {
+            target: 'welcome'
+          }
         }
-      }
-    },
+      },
 
-    scale_result: {
-      on: {
-        OVERRIDE_SA: {
-          actions: 'overrideSa'
-        },
-        TOGGLE_SA_HOLD: {
-          actions: 'toggleSaHold'
-        },
-        CONFIRM_SCALE: {
-          target: 'menu'
-        },
-        RETRY_SINGING: {
-          target: 'sing'
+      error_calibration: {
+        on: {
+          RETRY_CALIBRATION: {
+            target: 'calibrate'
+          },
+          GO_HOME: {
+            target: 'welcome'
+          },
+          GO_BACK: {
+            target: 'calibrate'
+          }
         }
-      }
-    },
+      },
 
-    menu: {
-      on: {
-        SELECT_CONDITION: {
-          actions: 'setCondition',
-          target: 'listen'
-        },
-        RETRY_SINGING: {
-          target: 'sing'
+      sing: {
+        entry: 'resetSessionCounters',
+        on: {
+          SINGING_COMPLETE: {
+            actions: 'setScaleResult',
+            target: 'scale_result'
+          },
+          RETRY_SINGING: {
+            target: 'sing'
+          },
+          GO_BACK: {
+            target: 'calibrate'
+          }
         }
-      }
-    },
+      },
 
-    listen: {
-      entry: 'resetSessionCounters',
-      on: {
-        START_CHANTING: {
-          target: 'chant_eval'
-        },
-        SELECT_CONDITION: {
-          actions: 'setCondition',
-          target: 'listen'
-        },
-        GO_HOME: {
-          target: 'welcome'
+      scale_result: {
+        on: {
+          OVERRIDE_SA: {
+            actions: 'overrideSa'
+          },
+          TOGGLE_SA_HOLD: {
+            actions: 'toggleSaHold'
+          },
+          CONFIRM_SCALE: {
+            target: 'menu'
+          },
+          RETRY_SINGING: {
+            target: 'sing'
+          },
+          GO_BACK: {
+            target: 'sing'
+          }
         }
-      }
-    },
+      },
 
-    chant_eval: {
-      on: {
-        EVAL_UPDATE: {
-          actions: 'updateEval'
-        },
-        EVAL_PASSED: {
-          target: 'chant_hold'
-        },
-        EVAL_FAILED: {
-          target: 'retry'
-        },
-        PAUSE: {
-          target: 'paused'
+      menu: {
+        on: {
+          SELECT_CONDITION: {
+            actions: 'setCondition',
+            target: 'listen'
+          },
+          RETRY_SINGING: {
+            target: 'sing'
+          },
+          VIEW_HISTORY: {
+            actions: assign({ pausedFromState: 'menu' }),
+            target: 'history'
+          },
+          GO_BACK: [
+            {
+              guard: ({ context }) => Boolean(context.scaleResult),
+              target: 'scale_result'
+            },
+            {
+              target: 'sing'
+            }
+          ]
         }
-      }
-    },
+      },
 
-    retry: {
-      on: {
-        ACKNOWLEDGE_RETRY: {
-          target: 'listen'
+      listen: {
+        entry: 'resetSessionCounters',
+        on: {
+          START_CHANTING: {
+            target: 'chant_eval'
+          },
+          SELECT_CONDITION: {
+            actions: 'setCondition',
+            target: 'listen'
+          },
+          CONFIRM_SCALE: {
+            target: 'menu'
+          },
+          CHANGE_CONDITION: {
+            target: 'menu'
+          },
+          GO_TO_MENU: {
+            target: 'menu'
+          },
+          GO_BACK: {
+            target: 'menu'
+          },
+          GO_HOME: {
+            target: 'welcome'
+          }
         }
-      }
-    },
+      },
 
-    chant_hold: {
-      on: {
-        HOLD_TICK: {
-          actions: 'updateHoldTick'
-        },
-        HOLD_PASSED: {
-          actions: 'saveSession',
-          target: 'session_done'
-        },
-        HOLD_FAILED: {
-          target: 'retry_short'
-        },
-        PAUSE: {
-          target: 'paused'
+      chant_eval: {
+        on: {
+          EVAL_UPDATE: {
+            actions: 'updateEval'
+          },
+          EVAL_PASSED: {
+            target: 'chant_hold'
+          },
+          EVAL_FAILED: {
+            target: 'retry'
+          },
+          PAUSE: {
+            target: 'paused'
+          },
+          GO_BACK: {
+            target: 'listen'
+          }
         }
-      }
-    },
+      },
 
-    retry_short: {
-      on: {
-        ACKNOWLEDGE_RETRY: {
-          target: 'listen'
+      retry: {
+        on: {
+          ACKNOWLEDGE_RETRY: {
+            target: 'listen'
+          },
+          GO_TO_MENU: {
+            target: 'menu'
+          },
+          GO_BACK: {
+            target: 'listen'
+          }
         }
-      }
-    },
+      },
 
-    session_done: {
-      on: {
-        GO_HOME: {
-          target: 'welcome'
-        },
-        VIEW_HISTORY: {
-          target: 'history'
+      chant_hold: {
+        on: {
+          HOLD_TICK: {
+            actions: 'updateHoldTick'
+          },
+          HOLD_PASSED: {
+            actions: 'saveSession',
+            target: 'session_done'
+          },
+          HOLD_FAILED: {
+            target: 'retry_short'
+          },
+          PAUSE: {
+            target: 'paused'
+          },
+          GO_BACK: {
+            target: 'listen'
+          }
         }
-      }
-    },
+      },
 
-    history: {
-      on: {
-        BACK_TO_APP: {
-          target: 'welcome'
+      retry_short: {
+        on: {
+          ACKNOWLEDGE_RETRY: {
+            target: 'listen'
+          },
+          GO_TO_MENU: {
+            target: 'menu'
+          },
+          GO_BACK: {
+            target: 'listen'
+          }
         }
-      }
-    },
+      },
 
-    paused: {
-      on: {
-        RESUME: {
-          target: 'chant_eval'
-        },
-        DISCARD: {
-          target: 'welcome'
+      session_done: {
+        on: {
+          GO_HOME: {
+            target: 'welcome'
+          },
+          VIEW_HISTORY: {
+            actions: assign({ pausedFromState: 'session_done' }),
+            target: 'history'
+          },
+          GO_TO_MENU: {
+            target: 'menu'
+          },
+          GO_BACK: {
+            target: 'menu'
+          }
+        }
+      },
+
+      history: {
+        on: {
+          BACK_TO_APP: [
+            {
+              guard: ({ context }) => context.pausedFromState === 'session_done',
+              target: 'session_done'
+            },
+            {
+              guard: ({ context }) => context.pausedFromState === 'menu',
+              target: 'menu'
+            },
+            {
+              target: 'welcome'
+            }
+          ],
+          GO_BACK: [
+            {
+              guard: ({ context }) => context.pausedFromState === 'session_done',
+              target: 'session_done'
+            },
+            {
+              guard: ({ context }) => context.pausedFromState === 'menu',
+              target: 'menu'
+            },
+            {
+              target: 'welcome'
+            }
+          ]
+        }
+      },
+
+      paused: {
+        on: {
+          RESUME: {
+            target: 'chant_eval'
+          },
+          DISCARD: {
+            target: 'welcome'
+          },
+          GO_BACK: {
+            target: 'listen'
+          }
         }
       }
     }
-  }
-});
+  });
+}
+
+export const appMachine = createAppMachine();

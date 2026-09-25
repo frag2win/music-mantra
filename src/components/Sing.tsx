@@ -3,18 +3,20 @@ import { detectScale, type ScaleDetectionResult, type PitchFrame } from '../audi
 import { AudioEngine } from '../audio/audio-engine';
 import { evaluateSaHold } from '../audio/sa-hold';
 import { useI18n } from '../i18n/I18nContext';
-import { CheckIcon, ClockIcon } from './common/Icons';
+import { CheckIcon, ClockIcon, ArrowLeftIcon } from './common/Icons';
 
 interface SingProps {
   saHoldEnabled?: boolean;
   onSingingComplete: (result: ScaleDetectionResult) => void;
   onRetrySinging: () => void;
+  onBack?: () => void;
 }
 
 export const Sing: React.FC<SingProps> = ({
   saHoldEnabled = false,
   onSingingComplete,
-  onRetrySinging
+  onRetrySinging,
+  onBack
 }) => {
   const { t } = useI18n();
   const targetDuration = saHoldEnabled ? 4 : 15;
@@ -250,14 +252,26 @@ export const Sing: React.FC<SingProps> = ({
         )}
       </div>
 
-      <button
-        className="btn-primary"
-        style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
-        disabled={!voicedTargetMet}
-        onClick={finishCapture}
-      >
-        {voicedTargetMet ? 'Finish & Analyze Key' : `Listening... (Need ${saHoldEnabled ? '4s' : '≥3s'} vocal data)`}
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <button
+          className="btn-primary"
+          style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
+          disabled={!voicedTargetMet}
+          onClick={finishCapture}
+        >
+          {voicedTargetMet ? 'Finish & Analyze Key' : `Listening... (Need ${saHoldEnabled ? '4s' : '≥3s'} vocal data)`}
+        </button>
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onBack}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back
+          </button>
+        )}
+      </div>
     </div>
   );
 };

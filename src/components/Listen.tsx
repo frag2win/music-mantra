@@ -3,7 +3,7 @@ import type { HealthCondition } from '../types';
 import { CONDITION_DETAILS } from '../types';
 import { AudioEngine } from '../audio/audio-engine';
 import { useI18n } from '../i18n/I18nContext';
-import { AlertTriangleIcon, PlayIcon, StopIcon, ClockIcon, MusicNoteIcon, LockIcon } from './common/Icons';
+import { AlertTriangleIcon, PlayIcon, StopIcon, ClockIcon, MusicNoteIcon, LockIcon, ArrowLeftIcon } from './common/Icons';
 
 interface ListenProps {
   condition: HealthCondition;
@@ -11,6 +11,7 @@ interface ListenProps {
   saHz: number;
   onStartChanting: () => void;
   onChangeCondition: () => void;
+  onBack?: () => void;
 }
 
 export const Listen: React.FC<ListenProps> = ({
@@ -18,7 +19,8 @@ export const Listen: React.FC<ListenProps> = ({
   saNote,
   saHz,
   onStartChanting,
-  onChangeCondition
+  onChangeCondition,
+  onBack
 }) => {
   const { t } = useI18n();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -101,8 +103,31 @@ export const Listen: React.FC<ListenProps> = ({
     onStartChanting();
   };
 
+  const handleBack = () => {
+    if (engineRef.current) {
+      engineRef.current.stopPlayback();
+    }
+    setIsPlaying(false);
+    if (onBack) {
+      onBack();
+    } else {
+      onChangeCondition();
+    }
+  };
+
   return (
     <div className="listen-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '1rem' }}>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={handleBack}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.35rem 0.8rem' }}
+        >
+          <ArrowLeftIcon size={14} /> Back to Condition Menu
+        </button>
+      </div>
+
       <h2 style={{ color: 'var(--chakra-theme-accent, var(--accent-primary))', marginBottom: '0.5rem' }}>
         {t('listen.title')}
       </h2>
@@ -193,8 +218,8 @@ export const Listen: React.FC<ListenProps> = ({
         >
           {t('listen.goAheadBtn')}
         </button>
-        <button className="btn-secondary" onClick={onChangeCondition}>
-          {t('listen.changeConditionBtn')}
+        <button className="btn-secondary" onClick={handleBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+          <ArrowLeftIcon size={16} /> {t('listen.changeConditionBtn')}
         </button>
       </div>
     </div>

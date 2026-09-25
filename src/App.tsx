@@ -1,6 +1,16 @@
 import React from 'react';
 import { useMachine } from '@xstate/react';
-import { appMachine } from './machine/app-machine';
+import {
+  createAppMachine,
+  INITIAL_CONTEXT,
+  canGoBack,
+  getBackDestinationTitle
+} from './machine/app-machine';
+import {
+  persistNavigationState,
+  loadPersistedContext,
+  loadPersistedState
+} from './utils/navigation-storage';
 import { Welcome } from './components/Welcome';
 import { Calibrate } from './components/Calibrate';
 import { Sing } from './components/Sing';
@@ -21,11 +31,25 @@ import { useI18n, LanguageSwitcher } from './i18n/I18nContext';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ChakraBackdrop } from './components/animations/ChakraBackdrop';
 
-import { LotusIcon, FlaskIcon, UserIcon, KeyIcon, WrenchIcon, ScaleIcon } from './components/common/Icons';
+import {
+  LotusIcon,
+  FlaskIcon,
+  UserIcon,
+  KeyIcon,
+  WrenchIcon,
+  ScaleIcon,
+  ArrowLeftIcon
+} from './components/common/Icons';
 
 export const App: React.FC = () => {
   const { t } = useI18n();
-  const [snapshot, send] = useMachine(appMachine);
+
+  // Load and hydrate persisted context and navigation state
+  const initialContext = React.useMemo(() => loadPersistedContext(INITIAL_CONTEXT), []);
+  const initialState = React.useMemo(() => loadPersistedState(), []);
+  const machine = React.useMemo(() => createAppMachine(initialContext, initialState || undefined), []);
+  const [snapshot, send] = useMachine(machine);
+
   const [showHarness, setShowHarness] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const [showBetaModal, setShowBetaModal] = React.useState(false);
@@ -33,6 +57,32 @@ export const App: React.FC = () => {
 
   const state = snapshot.value;
   const context = snapshot.context;
+
+  // Reusable Go-Back handler
+  const handleGoBack = React.useCallback(() => {
+    send({ type: 'GO_BACK' });
+  }, [send]);
+
+  // Synchronize browser history and persist context/state
+  React.useEffect(() => {
+    const stateStr = String(state);
+    persistNavigationState(stateStr, context);
+
+    const targetHash = `#${stateStr}`;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState({ appState: stateStr }, '', targetHash);
+    }
+  }, [state, context]);
+
+  // Connect native browser back/forward buttons (window.onpopstate)
+  React.useEffect(() => {
+    const handlePopState = () => {
+      send({ type: 'GO_BACK' });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [send]);
 
   return (
     <ThemeProvider activeCondition={context.selectedCondition}>
@@ -42,6 +92,36 @@ export const App: React.FC = () => {
       {/* Top Navbar */}
       <header className="app-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {/* Universal Header Back Button */}
+          {canGoBack(String(state)) && (
+            <button
+              type="button"
+              className="btn-back"
+              onClick={handleGoBack}
+              aria-label={getBackDestinationTitle(String(state), context)}
+              title={getBackDestinationTitle(String(state), context)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                background: 'rgba(30, 41, 59, 0.85)',
+                border: '1px solid rgba(148, 163, 184, 0.3)',
+                color: 'var(--text-primary)',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                backdropFilter: 'blur(8px)'
+              }}
+            >
+              <ArrowLeftIcon size={16} />
+              <span>{getBackDestinationTitle(String(state), context)}</span>
+            </button>
+          )}
+
           <LotusIcon size={28} color="var(--chakra-theme-accent, var(--accent-primary))" />
           <div>
             <h1 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
@@ -91,7 +171,9 @@ export const App: React.FC = () => {
             onClick={() => setShowHarness(!showHarness)}
           >
             {showHarness ? (
-              '← Back to App'
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <ArrowLeftIcon size={14} /> Back to App
+              </span>
             ) : (
               <>
                 <WrenchIcon size={14} style={{ marginRight: '0.4rem' }} /> DSP Harness
@@ -136,6 +218,13 @@ export const App: React.FC = () => {
                   >
                     Deny
                   </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={handleGoBack}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                  >
+                    <ArrowLeftIcon size={16} /> Back
+                  </button>
                 </div>
               </div>
             )}
@@ -148,9 +237,14 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   {context.errorMessage || 'Unable to access microphone. Please enable mic permissions in your browser settings.'}
                 </p>
-                <button className="btn-primary" onClick={() => send({ type: 'RETRY_PERMISSIONS' })}>
-                  Try Again
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                  <button className="btn-primary" onClick={() => send({ type: 'RETRY_PERMISSIONS' })}>
+                    Try Again
+                  </button>
+                  <button className="btn-secondary" onClick={handleGoBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <ArrowLeftIcon size={16} /> Back to Welcome
+                  </button>
+                </div>
               </div>
             )}
 
@@ -158,6 +252,7 @@ export const App: React.FC = () => {
               <Calibrate
                 onCalibrationDone={(result) => send({ type: 'CALIBRATION_DONE', result })}
                 onCalibrationFailed={(message) => send({ type: 'CALIBRATION_FAILED', message })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -169,9 +264,14 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   Room background noise was too high or microphone stream was interrupted.
                 </p>
-                <button className="btn-primary" onClick={() => send({ type: 'RETRY_CALIBRATION' })}>
-                  Retry Calibration
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                  <button className="btn-primary" onClick={() => send({ type: 'RETRY_CALIBRATION' })}>
+                    Retry Calibration
+                  </button>
+                  <button className="btn-secondary" onClick={handleGoBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <ArrowLeftIcon size={16} /> Back
+                  </button>
+                </div>
               </div>
             )}
 
@@ -180,6 +280,7 @@ export const App: React.FC = () => {
                 saHoldEnabled={context.saHoldEnabled}
                 onSingingComplete={(result) => send({ type: 'SINGING_COMPLETE', result })}
                 onRetrySinging={() => send({ type: 'RETRY_SINGING' })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -193,6 +294,7 @@ export const App: React.FC = () => {
                 onToggleSaHold={() => send({ type: 'TOGGLE_SA_HOLD' })}
                 onConfirmScale={() => send({ type: 'CONFIRM_SCALE' })}
                 onRetrySinging={() => send({ type: 'RETRY_SINGING' })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -200,28 +302,32 @@ export const App: React.FC = () => {
               <ConditionMenu
                 selectedSaNote={context.selectedSaNote || 'C'}
                 selectedSaHz={context.selectedSaHz || 261.63}
+                selectedCondition={context.selectedCondition}
                 onSelectCondition={(condition) => send({ type: 'SELECT_CONDITION', condition })}
                 onReSing={() => send({ type: 'RETRY_SINGING' })}
+                onBack={handleGoBack}
               />
             )}
 
-            {state === 'listen' && context.selectedCondition && (
+            {state === 'listen' && (
               <Listen
-                condition={context.selectedCondition}
+                condition={context.selectedCondition || 'diabetes'}
                 saNote={context.selectedSaNote || 'C'}
                 saHz={context.selectedSaHz || 261.63}
                 onStartChanting={() => send({ type: 'START_CHANTING' })}
-                onChangeCondition={() => send({ type: 'CONFIRM_SCALE' })}
+                onChangeCondition={() => send({ type: 'CHANGE_CONDITION' })}
+                onBack={handleGoBack}
               />
             )}
 
-            {state === 'chant_eval' && context.selectedCondition && (
+            {state === 'chant_eval' && (
               <ChantEval
-                condition={context.selectedCondition}
+                condition={context.selectedCondition || 'diabetes'}
                 saNote={context.selectedSaNote || 'C'}
                 saHz={context.selectedSaHz || 261.63}
                 onEvalPassed={(finalAcc) => send({ type: 'EVAL_PASSED', finalAccuracy: finalAcc })}
                 onEvalFailed={(finalAcc) => send({ type: 'EVAL_FAILED', finalAccuracy: finalAcc })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -229,12 +335,13 @@ export const App: React.FC = () => {
               <Retry
                 evalAccuracy={context.evalAccuracy}
                 onAcknowledgeRetry={() => send({ type: 'ACKNOWLEDGE_RETRY' })}
+                onBack={handleGoBack}
               />
             )}
 
-            {state === 'chant_hold' && context.selectedCondition && (
+            {state === 'chant_hold' && (
               <ChantHold
-                condition={context.selectedCondition}
+                condition={context.selectedCondition || 'diabetes'}
                 saNote={context.selectedSaNote || 'C'}
                 saHz={context.selectedSaHz || 261.63}
                 activeDay={context.activeDay}
@@ -245,6 +352,7 @@ export const App: React.FC = () => {
                 }}
                 onHoldFailed={() => send({ type: 'HOLD_FAILED' })}
                 onPause={() => send({ type: 'PAUSE' })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -252,6 +360,7 @@ export const App: React.FC = () => {
               <RetryShort
                 voicedSeconds={context.voicedSeconds}
                 onAcknowledgeRetry={() => send({ type: 'ACKNOWLEDGE_RETRY' })}
+                onBack={handleGoBack}
               />
             )}
 
@@ -288,6 +397,9 @@ export const App: React.FC = () => {
                   </button>
                   <button className="btn-secondary" onClick={() => send({ type: 'DISCARD' })}>
                     Discard Session
+                  </button>
+                  <button className="btn-secondary" onClick={handleGoBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <ArrowLeftIcon size={16} /> Back to Mantra
                   </button>
                 </div>
               </div>

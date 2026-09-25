@@ -2,16 +2,18 @@ import React, { useEffect, useState, useCallback } from 'react';
 import type { CalibrationResult } from '../audio/calibration';
 import { AudioEngine } from '../audio/audio-engine';
 import { useI18n } from '../i18n/I18nContext';
-import { AlertTriangleIcon, CheckCircleIcon } from './common/Icons';
+import { AlertTriangleIcon, CheckCircleIcon, ArrowLeftIcon } from './common/Icons';
 
 interface CalibrateProps {
   onCalibrationDone: (result: CalibrationResult) => void;
   onCalibrationFailed: (message: string) => void;
+  onBack?: () => void;
 }
 
 export const Calibrate: React.FC<CalibrateProps> = ({
   onCalibrationDone,
-  onCalibrationFailed
+  onCalibrationFailed,
+  onBack
 }) => {
   const { t } = useI18n();
   const [progress, setProgress] = useState(0);
@@ -119,11 +121,23 @@ export const Calibrate: React.FC<CalibrateProps> = ({
         </div>
       )}
 
-      {calibrationResult?.tooNoisy && (
-        <button className="btn-primary" onClick={startCalibration}>
-          Retry Noise Calibration
-        </button>
-      )}
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+        {calibrationResult?.tooNoisy && (
+          <button className="btn-primary" onClick={startCalibration}>
+            Retry Noise Calibration
+          </button>
+        )}
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onBack}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back to Welcome
+          </button>
+        )}
+      </div>
     </div>
   );
 };

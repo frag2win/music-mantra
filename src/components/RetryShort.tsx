@@ -1,14 +1,18 @@
 import React from 'react';
+import { ClockIcon, ArrowLeftIcon } from './common/Icons';
 
 interface RetryShortProps {
   voicedSeconds: number;
   onAcknowledgeRetry: () => void;
+  onBack?: () => void;
 }
 
-export const RetryShort: React.FC<RetryShortProps> = ({ voicedSeconds, onAcknowledgeRetry }) => {
+export const RetryShort: React.FC<RetryShortProps> = ({ voicedSeconds, onAcknowledgeRetry, onBack }) => {
   return (
     <div className="retry-short-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>⌛</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <ClockIcon size={48} color="var(--warning)" />
+      </div>
       <h2 style={{ color: 'var(--warning)', marginBottom: '0.5rem' }}>
         Insufficient Voiced Chanting Time
       </h2>
@@ -32,13 +36,25 @@ export const RetryShort: React.FC<RetryShortProps> = ({ voicedSeconds, onAcknowl
         </p>
       </div>
 
-      <button
-        className="btn-primary"
-        style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
-        onClick={onAcknowledgeRetry}
-      >
-        Re-try Practice Session
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <button
+          className="btn-primary"
+          style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
+          onClick={onAcknowledgeRetry}
+        >
+          Re-try Practice Session
+        </button>
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onBack}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back
+          </button>
+        )}
+      </div>
     </div>
   );
 };

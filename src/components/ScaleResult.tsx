@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ScaleDetectionResult } from '../audio/scale-detector';
-import { AlertTriangleIcon } from './common/Icons';
+import { AlertTriangleIcon, ArrowLeftIcon } from './common/Icons';
 
 interface ScaleResultProps {
   scaleResult: ScaleDetectionResult | null;
@@ -11,6 +11,7 @@ interface ScaleResultProps {
   onToggleSaHold: () => void;
   onConfirmScale: () => void;
   onRetrySinging: () => void;
+  onBack?: () => void;
 }
 
 const ALL_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -38,7 +39,8 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
   onOverrideSa,
   onToggleSaHold,
   onConfirmScale,
-  onRetrySinging
+  onRetrySinging,
+  onBack
 }) => {
   if (!scaleResult) {
     return (
@@ -148,6 +150,11 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
         <button className="btn-secondary" onClick={onRetrySinging}>
           Re-sing Song
         </button>
+        {onBack && (
+          <button className="btn-secondary" onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <ArrowLeftIcon size={16} /> Back
+          </button>
+        )}
       </div>
     </div>
   );

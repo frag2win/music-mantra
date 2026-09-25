@@ -9,7 +9,7 @@ import { wakeLockManager } from '../utils/wake-lock';
 import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
 import { useI18n } from '../i18n/I18nContext';
 import { ChakraBackdrop } from './animations/ChakraBackdrop';
-import { InfoIcon } from './common/Icons';
+import { InfoIcon, ArrowLeftIcon } from './common/Icons';
 import { apiClient } from '../api/client';
 
 interface ChantHoldProps {
@@ -21,6 +21,7 @@ interface ChantHoldProps {
   onHoldPassed: (session: SessionRecord) => void;
   onHoldFailed: () => void;
   onPause: () => void;
+  onBack?: () => void;
 }
 
 export const ChantHold: React.FC<ChantHoldProps> = ({
@@ -31,7 +32,8 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
   evalAccuracy,
   onHoldPassed,
   onHoldFailed,
-  onPause
+  onPause,
+  onBack
 }) => {
   const { t } = useI18n();
   const detail = CONDITION_DETAILS[condition];
@@ -258,9 +260,29 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
         )}
       </div>
 
-      <button className="btn-secondary" style={{ marginTop: '1rem' }} onClick={onPause}>
-        Pause Session
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+        <button className="btn-secondary" onClick={onPause}>
+          Pause Session
+        </button>
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              isCompleteRef.current = true;
+              if (engineRef.current) {
+                engineRef.current.stopListening();
+                engineRef.current.destroy();
+              }
+              wakeLockManager.release();
+              onBack();
+            }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back to Mantra Preview
+          </button>
+        )}
+      </div>
     </div>
   );
 };

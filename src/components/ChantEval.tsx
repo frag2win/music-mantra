@@ -9,6 +9,7 @@ import { wakeLockManager } from '../utils/wake-lock';
 import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
 import { useI18n } from '../i18n/I18nContext';
 import { ChakraBackdrop } from './animations/ChakraBackdrop';
+import { ArrowLeftIcon } from './common/Icons';
 
 import { apiClient } from '../api/client';
 
@@ -18,6 +19,7 @@ interface ChantEvalProps {
   saHz: number;
   onEvalPassed: (finalAccuracy: number) => void;
   onEvalFailed: (finalAccuracy: number) => void;
+  onBack?: () => void;
 }
 
 export const ChantEval: React.FC<ChantEvalProps> = ({
@@ -25,7 +27,8 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
   saNote,
   saHz,
   onEvalPassed,
-  onEvalFailed
+  onEvalFailed,
+  onBack
 }) => {
   const { t } = useI18n();
   const detail = CONDITION_DETAILS[condition];
@@ -230,6 +233,27 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
           />
         </div>
       </div>
+
+      {onBack && (
+        <div style={{ marginTop: '1.5rem' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              isFinishedRef.current = true;
+              if (engineRef.current) {
+                engineRef.current.stopListening();
+                engineRef.current.destroy();
+              }
+              wakeLockManager.release();
+              onBack();
+            }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back to Mantra Preview
+          </button>
+        </div>
+      )}
     </div>
   );
 };

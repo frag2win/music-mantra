@@ -1,12 +1,13 @@
 import React from 'react';
-import { TargetIcon } from './common/Icons';
+import { TargetIcon, ArrowLeftIcon } from './common/Icons';
 
 interface RetryProps {
   evalAccuracy: number;
   onAcknowledgeRetry: () => void;
+  onBack?: () => void;
 }
 
-export const Retry: React.FC<RetryProps> = ({ evalAccuracy, onAcknowledgeRetry }) => {
+export const Retry: React.FC<RetryProps> = ({ evalAccuracy, onAcknowledgeRetry, onBack }) => {
   return (
     <div className="retry-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
@@ -36,13 +37,25 @@ export const Retry: React.FC<RetryProps> = ({ evalAccuracy, onAcknowledgeRetry }
         </p>
       </div>
 
-      <button
-        className="btn-primary"
-        style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
-        onClick={onAcknowledgeRetry}
-      >
-        Return to Listen to Mantra Again
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <button
+          className="btn-primary"
+          style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}
+          onClick={onAcknowledgeRetry}
+        >
+          Return to Listen to Mantra Again
+        </button>
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onBack}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back
+          </button>
+        )}
+      </div>
     </div>
   );
 };

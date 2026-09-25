@@ -4,20 +4,24 @@ import { CONDITION_DETAILS } from '../types';
 import { useI18n } from '../i18n/I18nContext';
 import { useOptionalTheme } from '../theme/ThemeContext';
 import { CHAKRA_THEMES } from '../theme/chakraThemes';
-import { SunIcon, LeafIcon, WaveIcon } from './common/Icons';
+import { SunIcon, LeafIcon, WaveIcon, ArrowLeftIcon } from './common/Icons';
 
 interface ConditionMenuProps {
   selectedSaNote: string;
   selectedSaHz: number;
+  selectedCondition?: HealthCondition | null;
   onSelectCondition: (condition: HealthCondition) => void;
   onReSing: () => void;
+  onBack?: () => void;
 }
 
 export const ConditionMenu: React.FC<ConditionMenuProps> = ({
   selectedSaNote,
   selectedSaHz,
+  selectedCondition,
   onSelectCondition,
-  onReSing
+  onReSing,
+  onBack
 }) => {
   const { t } = useI18n();
   const themeContext = useOptionalTheme();
@@ -152,11 +156,24 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                   onSelectCondition(item.id);
                 }}
               >
-                Select {t(`conditions.${item.id}.name`)} Theme
+                {selectedCondition === item.id ? 'Continue with' : 'Select'} {t(`conditions.${item.id}.name`)} Theme
               </button>
             </div>
           );
         })}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+        {onBack && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onBack}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.65rem 1.5rem', fontSize: '0.95rem' }}
+          >
+            <ArrowLeftIcon size={16} /> Back to Scale Tuning
+          </button>
+        )}
       </div>
     </div>
   );

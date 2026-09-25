@@ -286,4 +286,13 @@ export const ArrowDownIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
+/** Arrow Left (Back navigation) */
+export const ArrowLeftIcon: React.FC<IconProps> = (props) => (
+  <svg {...defaultProps(props)}>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+
+
 
