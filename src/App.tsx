@@ -18,6 +18,8 @@ import { AuthModal } from './components/common/AuthModal';
 import { BetaFeedbackModal } from './components/common/BetaFeedbackModal';
 import { apiClient } from './api/client';
 import { useI18n, LanguageSwitcher } from './i18n/I18nContext';
+import { ThemeProvider } from './theme/ThemeProvider';
+import { ChakraBackdrop } from './components/animations/ChakraBackdrop';
 
 export const App: React.FC = () => {
   const { t } = useI18n();
@@ -31,7 +33,10 @@ export const App: React.FC = () => {
   const context = snapshot.context;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <ThemeProvider activeCondition={context.selectedCondition}>
+      {/* Full-viewport ambient background sitting behind all screens at 60fps */}
+      <ChakraBackdrop variant="fullscreen" />
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Top Navbar */}
       <header
         style={{
@@ -318,6 +323,7 @@ export const App: React.FC = () => {
         </div>
       </footer>
     </div>
+    </ThemeProvider>
   );
 };
 

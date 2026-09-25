@@ -6,6 +6,9 @@ import { centError as calcCentError, centToAccuracy, evaluationGatePassed } from
 import type { PitchFrame } from '../audio/scale-detector';
 import { PitchMeter } from './common/PitchMeter';
 import { wakeLockManager } from '../utils/wake-lock';
+import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
+import { useI18n } from '../i18n/I18nContext';
+import { ChakraBackdrop } from './animations/ChakraBackdrop';
 
 interface ChantEvalProps {
   condition: HealthCondition;
@@ -21,6 +24,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
   onEvalPassed,
   onEvalFailed
 }) => {
+  const { t } = useI18n();
   const detail = CONDITION_DETAILS[condition];
   const targetHz = saHz * detail.ratio;
 
@@ -107,15 +111,36 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
 
   return (
     <div className="chant-eval-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
-        Step 5: Initial Pitch Accuracy Evaluation
+      {/* WCAG 2.1 AA Screen Reader Live Announcer */}
+      <ScreenReaderAnnouncer
+        message={`${t('chantEval.accuracy')}: ${Math.round(currentAccuracy)} percent. ${
+          Math.abs(centErr) <= 15
+            ? t('chantEval.inTune')
+            : centErr < 0
+              ? t('chantEval.flat')
+              : t('chantEval.sharp')
+        }`}
+        minIntervalMs={3500}
+      />
+
+      <h2 style={{ color: 'var(--chakra-theme-accent, var(--accent-primary))', marginBottom: '0.5rem' }}>
+        {t('chantEval.title')}
       </h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        Chant <strong>"{detail.mantra}"</strong> continuously for 7.5 seconds to pass accuracy evaluation (Target ≥90%)
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+        {t('chantEval.instruction', {
+          mantra: t(`conditions.${detail.id}.mantra`),
+          swar: t(`conditions.${detail.id}.swar`),
+          targetHz: targetHz.toFixed(1),
+          passAcc: 90,
+          voicedSec: 7.5
+        })}
       </p>
 
+      {/* Calming visual motion anchor */}
+      <ChakraBackdrop size={180} showGuideText={false} showIntensityControl={false} />
+
       {/* FR-7 Live Accuracy Display */}
-      <div style={{ margin: '1rem 0' }}>
+      <div style={{ margin: '0.5rem 0' }}>
         <PitchMeter
           currentAccuracy={currentAccuracy}
           targetNote={targetNoteName}
@@ -123,7 +148,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
           currentNote={currentNote}
           currentHz={currentHz}
           centError={centErr}
-          label="Live Chanting Accuracy"
+          label={t('chantEval.accuracy')}
         />
       </div>
 

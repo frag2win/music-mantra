@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import type { CalibrationResult } from '../audio/calibration';
 import { AudioEngine } from '../audio/audio-engine';
+import { useI18n } from '../i18n/I18nContext';
 
 interface CalibrateProps {
   onCalibrationDone: (result: CalibrationResult) => void;
@@ -11,6 +12,7 @@ export const Calibrate: React.FC<CalibrateProps> = ({
   onCalibrationDone,
   onCalibrationFailed
 }) => {
+  const { t } = useI18n();
   const [progress, setProgress] = useState(0);
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [calibrationResult, setCalibrationResult] = useState<CalibrationResult | null>(null);
@@ -61,10 +63,10 @@ export const Calibrate: React.FC<CalibrateProps> = ({
   return (
     <div className="calibrate-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
       <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
-        Step 1: Noise-Floor Calibration
+        {t('calibrate.title')}
       </h2>
       <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-        Please remain quiet for 3 seconds while we measure ambient room background noise.
+        {t('calibrate.instruction')}
       </p>
 
       {/* Animation & Progress Bar */}

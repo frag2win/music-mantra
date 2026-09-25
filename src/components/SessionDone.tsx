@@ -2,6 +2,7 @@ import React from 'react';
 import type { SessionRecord } from '../types';
 import { CONDITION_DETAILS } from '../types';
 import { apiClient } from '../api/client';
+import { useI18n } from '../i18n/I18nContext';
 
 interface SessionDoneProps {
   session: SessionRecord | null;
@@ -18,13 +19,14 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
   onGoHome,
   onViewHistory
 }) => {
+  const { t } = useI18n();
   const detail = session ? CONDITION_DETAILS[session.condition] : null;
 
   return (
     <div className="session-done-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
       <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>🎉</div>
       <h2 style={{ color: 'var(--success)', marginBottom: '0.5rem', fontSize: '2rem' }}>
-        Session Completed!
+        {t('sessionDone.title')}
       </h2>
 
       {/* FR-10 Requirement Text */}

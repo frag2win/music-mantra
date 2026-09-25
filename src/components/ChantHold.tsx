@@ -6,6 +6,9 @@ import { centError as calcCentError, centToAccuracy } from '../audio/accuracy';
 import type { PitchFrame } from '../audio/scale-detector';
 import { PitchMeter } from './common/PitchMeter';
 import { wakeLockManager } from '../utils/wake-lock';
+import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
+import { useI18n } from '../i18n/I18nContext';
+import { ChakraBackdrop } from './animations/ChakraBackdrop';
 
 interface ChantHoldProps {
   condition: HealthCondition;
@@ -28,10 +31,12 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
   onHoldFailed,
   onPause
 }) => {
+  const { t } = useI18n();
   const detail = CONDITION_DETAILS[condition];
   const targetHz = saHz * detail.ratio;
 
   const [remainingSeconds, setRemainingSeconds] = useState(600); // 10 minutes (600s)
+  const remainingRef = useRef<number>(600);
   const [voicedSeconds, setVoicedSeconds] = useState(0);
   const [currentAccuracy, setCurrentAccuracy] = useState(evalAccuracy);
   const [currentNote, setCurrentNote] = useState<string>('--');
@@ -45,6 +50,8 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
 
   useEffect(() => {
     isCompleteRef.current = false;
+    remainingRef.current = 600;
+    setRemainingSeconds(600);
     wakeLockManager.acquire();
 
     const engine = new AudioEngine({
@@ -121,14 +128,13 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
 
     // 1-second wall clock countdown timer (FR-9)
     const countdownTimer = setInterval(() => {
-      setRemainingSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownTimer);
-          finishHoldSession();
-          return 0;
-        }
-        return prev - 1;
-      });
+      remainingRef.current -= 1;
+      setRemainingSeconds(remainingRef.current);
+
+      if (remainingRef.current <= 0) {
+        clearInterval(countdownTimer);
+        finishHoldSession();
+      }
     }, 1000);
 
     return () => {
@@ -150,15 +156,24 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
 
   return (
     <div className="chant-hold-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
-        Step 6: 10-Minute Guided Chanting Hold
+      {/* WCAG 2.1 AA Screen Reader Live Announcer */}
+      <ScreenReaderAnnouncer
+        message={`${t('chantHold.timeRemaining', { time: formattedTime })}. ${t('chantEval.accuracy')}: ${Math.round(currentAccuracy)} percent.`}
+        minIntervalMs={4000}
+      />
+
+      <h2 style={{ color: 'var(--chakra-theme-accent, var(--accent-primary))', marginBottom: '0.5rem' }}>
+        {t('chantHold.title')}
       </h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-        Condition: <strong style={{ color: 'var(--text-primary)' }}>{detail.name}</strong> ("{detail.mantra}") · Key: <strong>{saNote} ({saHz.toFixed(1)} Hz)</strong>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+        Condition: <strong style={{ color: 'var(--text-primary)' }}>{t(`conditions.${detail.id}.name`)}</strong> ("{t(`conditions.${detail.id}.mantra`)}") · Key: <strong>{saNote} ({saHz.toFixed(1)} Hz)</strong>
       </p>
 
+      {/* Calming visual motion anchor for 10-minute hold */}
+      <ChakraBackdrop size={200} showGuideText={true} showIntensityControl={false} />
+
       {/* Timer Display */}
-      <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem', maxWidth: '350px', margin: '0 auto 1.5rem auto' }}>
+      <div style={{ background: '#0f172a', border: '1px solid var(--chakra-theme-card-border, #334155)', borderRadius: '12px', padding: '1.25rem', maxWidth: '350px', margin: '0 auto 1.5rem auto' }}>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>COUNTDOWN REMAINING</div>
         <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{formattedTime}</div>
       </div>
@@ -166,7 +181,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
       {/* Pitch Meter */}
       <PitchMeter
         currentAccuracy={currentAccuracy}
-        targetNote={`${detail.swar} (${detail.mantra})`}
+        targetNote={`${t(`conditions.${detail.id}.swar`)} (${t(`conditions.${detail.id}.mantra`)})`}
         targetHz={targetHz}
         currentNote={currentNote}
         currentHz={currentHz}

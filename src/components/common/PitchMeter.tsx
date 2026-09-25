@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useOptionalTheme } from '../../theme/ThemeContext';
 
 interface PitchMeterProps {
   currentAccuracy: number; // 0..100
@@ -19,6 +20,8 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
   centError = 0,
   label = 'Chanting Pitch Accuracy'
 }) => {
+  const themeContext = useOptionalTheme();
+  const theme = themeContext?.theme;
   const ariaLiveRef = useRef<HTMLDivElement>(null);
   const lastAnnouncedTime = useRef<number>(0);
 
@@ -31,25 +34,108 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
     }
   }, [currentAccuracy, label]);
 
+  // Calming Chromotherapy Palette (avoids commonly cited red-alert stress cues)
+  const inTuneColor = theme?.pitchFeedback.inTune || 'var(--chakra-pitch-in-tune, #10b981)';
+  const nearTuneColor = theme?.pitchFeedback.nearTune || 'var(--chakra-pitch-near-tune, #f59e0b)';
+  const offPitchColor = theme?.pitchFeedback.offPitch || 'var(--chakra-pitch-off-pitch, #78716c)';
+
+  const activeColor =
+    currentAccuracy >= 90
+      ? inTuneColor
+      : currentAccuracy >= 70
+        ? nearTuneColor
+        : offPitchColor;
+
   // Map cent error (-100 to +100 cents window for visual slider indicator)
   const clampedCents = Math.max(-100, Math.min(100, centError));
   // Convert -100..+100 cents to 0..100% position on gauge
   const gaugePosition = ((clampedCents + 100) / 200) * 100;
 
+  // Accessibility: State classification independent of color (distinguishable under deuteranopia/protanopia)
+  const isResonant = currentAccuracy >= 90;
+  const isNear = currentAccuracy >= 70 && !isResonant;
+  const isFlat = centError < -20;
+  const isSharp = centError > 20;
+
+  const statusBadge = isResonant
+    ? { icon: '★', label: 'IN TUNE', desc: 'Resonance Lock Reached (≥90%)' }
+    : isNear
+      ? { icon: '◉', label: 'NEAR TUNE', desc: 'Approaching Resonance — Steady Breath' }
+      : isFlat
+        ? { icon: '▲', label: 'FLAT', desc: 'Gently Raise Pitch Upward' }
+        : isSharp
+          ? { icon: '▼', label: 'SHARP', desc: 'Gently Ease Pitch Downward' }
+          : { icon: '◆', label: 'ADJUSTING', desc: 'Sing Into Microphone' };
+
   return (
     <div className="pitch-meter card" style={{ textAlign: 'center', margin: '1rem 0' }}>
       <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>{label}</h3>
 
-      {/* Main Accuracy Display */}
-      <div style={{ fontSize: '2.5rem', fontWeight: 800, color: currentAccuracy >= 90 ? 'var(--success)' : currentAccuracy >= 75 ? 'var(--warning)' : 'var(--danger)' }}>
+      {/* Main Accuracy Display with sound-reactive glow */}
+      <div
+        style={{
+          fontSize: '2.6rem',
+          fontWeight: 800,
+          color: activeColor,
+          textShadow: isResonant ? `0 0 20px ${inTuneColor}` : 'none',
+          transition: 'color 0.3s ease, text-shadow 0.3s ease',
+        }}
+      >
         {Math.round(currentAccuracy)}%
       </div>
+
+      {/* Accessible Non-Color-Sole Status Pill (Protanopia/Deuteranopia & Grayscale Safe) */}
+      <div style={{ margin: '0.25rem 0 0.75rem 0' }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '20px',
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            letterSpacing: '0.75px',
+            background: isResonant
+              ? inTuneColor
+              : isNear
+                ? 'rgba(245, 158, 11, 0.22)'
+                : 'rgba(100, 116, 139, 0.3)',
+            color: isResonant
+              ? (theme?.id === 'diabetes' ? '#1c1917' : '#ffffff')
+              : isNear
+                ? '#fde68a'
+                : '#f1f5f9',
+            border: isResonant
+              ? `1px solid ${inTuneColor}`
+              : isNear
+                ? `1px dashed ${nearTuneColor}`
+                : '1px solid #94a3b8',
+            boxShadow: isResonant ? `0 0 10px ${inTuneColor}55` : 'none',
+          }}
+          aria-label={`Pitch status: ${statusBadge.label}`}
+        >
+          <span aria-hidden="true" style={{ fontSize: '0.9rem' }}>{statusBadge.icon}</span>
+          <span>[{statusBadge.label}]</span>
+        </span>
+      </div>
+
       <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        {currentAccuracy >= 90 ? 'Target Accuracy Reached (≥90%)' : 'Align your voice to match target note'}
+        {statusBadge.desc}
       </div>
 
       {/* Visual Cent Deviation Meter */}
-      <div style={{ position: 'relative', height: '24px', background: '#334155', borderRadius: '12px', overflow: 'hidden', margin: '1rem 0' }}>
+      <div
+        style={{
+          position: 'relative',
+          height: '28px',
+          background: 'rgba(15, 23, 42, 0.85)',
+          borderRadius: '14px',
+          overflow: 'hidden',
+          margin: '1rem 0',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+        }}
+      >
         {/* Center Target Zone (±20 cents = 90%+ accuracy) */}
         <div
           style={{
@@ -57,74 +143,96 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
             left: '40%',
             width: '20%',
             height: '100%',
-            background: 'rgba(34, 197, 94, 0.25)',
-            borderLeft: '1px dashed var(--success)',
-            borderRight: '1px dashed var(--success)'
+            background: `${inTuneColor}22`,
+            borderLeft: `2px dashed ${inTuneColor}`,
+            borderRight: `2px dashed ${inTuneColor}`,
+            transition: 'background 0.3s ease',
           }}
           title="90% Accuracy Target Zone (±20 cents)"
         />
-        {/* Pitch Position Indicator Pin */}
+
+        {/* Center 0 cents line */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            bottom: 0,
+            width: '1px',
+            background: 'rgba(255, 255, 255, 0.4)',
+          }}
+        />
+
+        {/* Pitch Position Indicator Pin with Sound-Reactive Glow & Diamond Marker */}
         <div
           style={{
             position: 'absolute',
             left: `${gaugePosition}%`,
             top: 0,
             bottom: 0,
-            width: '6px',
-            marginLeft: '-3px',
-            backgroundColor: currentAccuracy >= 90 ? 'var(--success)' : 'var(--accent-primary)',
-            borderRadius: '3px',
-            boxShadow: '0 0 8px rgba(255,255,255,0.8)',
-            transition: 'left 0.15s ease-out'
+            width: '8px',
+            marginLeft: '-4px',
+            backgroundColor: activeColor,
+            borderRadius: '4px',
+            border: '1px solid #ffffff',
+            boxShadow:
+              isResonant
+                ? `0 0 16px ${inTuneColor}, 0 0 6px #ffffff`
+                : isNear
+                  ? `0 0 10px ${nearTuneColor}`
+                  : '0 0 4px rgba(255,255,255,0.4)',
+            transition: 'left 0.15s ease-out, background-color 0.3s ease, box-shadow 0.3s ease',
           }}
         />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        <span>-100 cents (Flat)</span>
-        <span>Target Swara (0 cents)</span>
-        <span>+100 cents (Sharp)</span>
+        <span>◀ -100¢ [FLAT]</span>
+        <span style={{ color: isResonant ? activeColor : 'var(--text-primary)', fontWeight: 700 }}>
+          🎯 Target Swara [0¢]
+        </span>
+        <span>+100¢ [SHARP] ▶</span>
       </div>
 
-      {/* Real-time Directional Coaching & Motivational Advice */}
+      {/* Real-time Directional Coaching (avoids red alert stress cues) */}
       <div
         style={{
           marginTop: '1rem',
           padding: '0.85rem 1rem',
           borderRadius: '10px',
           background:
-            currentAccuracy >= 90
-              ? 'rgba(34, 197, 94, 0.15)'
-              : currentAccuracy >= 70
-                ? 'rgba(234, 179, 8, 0.12)'
-                : 'rgba(239, 68, 68, 0.12)',
+            isResonant
+              ? `${inTuneColor}22`
+              : isNear
+                ? `${nearTuneColor}18`
+                : 'rgba(51, 65, 85, 0.55)',
           border: `1px solid ${
-            currentAccuracy >= 90
-              ? 'var(--success)'
-              : currentAccuracy >= 70
-                ? 'var(--warning)'
-                : 'var(--danger)'
+            isResonant
+              ? `${inTuneColor}88`
+              : isNear
+                ? `${nearTuneColor}77`
+                : 'rgba(148, 163, 184, 0.4)'
           }`,
           fontSize: '0.95rem',
           fontWeight: 600,
           color:
-            currentAccuracy >= 90
-              ? '#86efac'
-              : currentAccuracy >= 70
-                ? '#fde047'
-                : '#fca5a5',
-          transition: 'all 0.2s ease',
+            isResonant
+              ? (theme?.id === 'diabetes' ? '#fde68a' : inTuneColor)
+              : isNear
+                ? nearTuneColor
+                : '#f1f5f9',
+          transition: 'all 0.3s ease',
         }}
       >
         {currentHz ? (
-          currentAccuracy >= 90 ? (
-            <span>⭐ Perfect Resonance! Keep holding this exact swara steadily.</span>
-          ) : centError < -20 ? (
-            <span>⬆️ Pitch is flat. Raise your voice slightly higher to hit the note.</span>
-          ) : centError > 20 ? (
-            <span>⬇️ Pitch is sharp. Lower your pitch gently to match the swara.</span>
+          isResonant ? (
+            <span>★ Harmonic Lock! Resonating smoothly with the target swara.</span>
+          ) : isFlat ? (
+            <span>▲ Pitch is flat. Raise your vocal tone gently upward.</span>
+          ) : isSharp ? (
+            <span>▼ Pitch is sharp. Ease your vocal tone gently downward.</span>
           ) : (
-            <span>🎯 Almost there! Stabilize your vocal breath.</span>
+            <span>◉ Almost in tune! Steady your breath in the target zone.</span>
           )
         ) : (
           <span>🎙️ Chant the mantra into your microphone to begin feedback...</span>
