@@ -246,6 +246,7 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
 
       {/* Real-time Directional Coaching (avoids red alert stress cues) */}
       <div
+        className="pitch-coaching-box"
         style={{
           marginTop: '1rem',
           padding: '0.85rem 1rem',
@@ -307,7 +308,7 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
 
       {/* Detailed pitch metadata */}
       {(targetNote || currentNote) && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem', background: '#0f172a', padding: '0.75rem', borderRadius: '8px' }}>
+        <div className="pitch-note-meta" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem', background: '#0f172a', padding: '0.75rem', borderRadius: '8px' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>TARGET NOTE</div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>{targetNote || '--'}</div>

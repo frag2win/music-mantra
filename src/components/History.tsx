@@ -17,7 +17,7 @@ export const History: React.FC<HistoryProps> = ({
 }) => {
   return (
     <div className="history-screen card" style={{ padding: '2rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="history-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ color: 'var(--accent-primary)', marginBottom: '0.25rem' }}>
             Session History Log
@@ -37,8 +37,8 @@ export const History: React.FC<HistoryProps> = ({
           <p style={{ fontSize: '0.9rem' }}>Complete your first 10-minute chanting practice to log a session here.</p>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.92rem' }}>
+        <div className="history-table-wrapper" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="history-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.92rem' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #334155', color: 'var(--text-secondary)' }}>
                 <th style={{ padding: '0.75rem 0.5rem' }}>Day</th>

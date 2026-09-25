@@ -174,7 +174,7 @@ export const Sing: React.FC<SingProps> = ({
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
           LIVE DETECTED NOTE
         </div>
-        <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+        <div className="sung-note-display" style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
           {currentNote}
         </div>
         {currentHz && <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{currentHz.toFixed(1)} Hz</div>}
@@ -205,7 +205,7 @@ export const Sing: React.FC<SingProps> = ({
       </div>
 
       {/* Timers & Gate Progress */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', maxWidth: '450px', margin: '0 auto 1.5rem auto' }}>
+      <div className="sing-timer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', maxWidth: '450px', margin: '0 auto 1.5rem auto' }}>
         <div style={{ background: '#1e293b', border: '1px solid #334155', padding: '0.75rem', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>TIME ELAPSED</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{elapsedSeconds}s / {targetDuration}s</div>
@@ -252,7 +252,7 @@ export const Sing: React.FC<SingProps> = ({
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
         <button
           className="btn-primary"
           style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}

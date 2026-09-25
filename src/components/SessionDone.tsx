@@ -120,7 +120,7 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
             SESSION STATISTICS (DAY {session.dayIndex})
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.95rem' }}>
+          <div className="session-stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.95rem' }}>
             <div>
               <span style={{ color: 'var(--text-secondary)' }}>Condition:</span>
               <div style={{ fontWeight: 700 }}>{detail?.name}</div>
@@ -149,7 +149,7 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }} onClick={onGoHome}>
           Return to Dashboard
         </button>

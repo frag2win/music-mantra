@@ -235,7 +235,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
       </div>
 
       {onBack && (
-        <div style={{ marginTop: '1.5rem' }}>
+        <div className="screen-action-group" style={{ marginTop: '1.5rem' }}>
           <button
             type="button"
             className="btn-secondary"

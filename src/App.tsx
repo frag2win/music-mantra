@@ -96,7 +96,7 @@ export const App: React.FC = () => {
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Top Navbar */}
       <header className="app-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="app-header-brand">
           {/* Universal Header Back Button */}
           {canGoBack(String(state)) && (
             <button
@@ -107,77 +107,64 @@ export const App: React.FC = () => {
               title={getBackDestinationTitle(String(state), context)}
             >
               <ArrowLeftIcon size={16} />
-              <span>{getBackDestinationTitle(String(state), context)}</span>
+              <span className="btn-back-text">{getBackDestinationTitle(String(state), context)}</span>
             </button>
           )}
 
-          <LotusIcon size={28} color="var(--chakra-theme-accent, var(--accent-primary))" />
-          <div>
-            <h1 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-              {t('app.title')}
-            </h1>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              {t('app.subtitle')}
-            </span>
+          <div className="app-header-logo-group">
+            <LotusIcon size={28} color="var(--chakra-theme-accent, var(--accent-primary))" />
+            <div className="app-header-text">
+              <h1 className="app-header-title">
+                {t('app.title')}
+              </h1>
+              <span className="app-header-subtitle">
+                {t('app.subtitle')}
+              </span>
+            </div>
           </div>
         </div>
 
         <div className="app-header-controls">
           <LanguageSwitcher />
 
-          <div
-            style={{
-              background: 'rgba(30, 41, 59, 0.75)',
-              padding: '0.42rem 0.9rem',
-              borderRadius: '16px 3px 16px 3px',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              border: '1px solid rgba(255, 255, 255, 0.16)',
-              color: 'var(--text-primary)',
-              backdropFilter: 'blur(12px)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-            }}
-          >
+          <div className="app-day-badge">
             {t('app.dayProgress', { day: context.activeDay })}
           </div>
 
           <button
-            className="btn-secondary"
-            style={{ fontSize: '0.82rem', padding: '0.42rem 0.85rem', display: 'inline-flex', alignItems: 'center' }}
+            className="btn-secondary btn-header-action"
             onClick={() => setShowBetaModal(true)}
             title="Inspect device diagnostics and submit beta feedback"
           >
-            <FlaskIcon size={14} style={{ marginRight: '0.4rem' }} /> Feedback
+            <FlaskIcon size={14} style={{ marginRight: '0.35rem' }} /> <span>Feedback</span>
           </button>
 
           <button
-            className="btn-secondary"
-            style={{ fontSize: '0.82rem', padding: '0.42rem 0.85rem', display: 'inline-flex', alignItems: 'center' }}
+            className="btn-secondary btn-header-action"
             onClick={() => setShowAuthModal(true)}
           >
             {isAuthenticated ? (
               <>
-                <UserIcon size={14} style={{ marginRight: '0.4rem' }} /> Account
+                <UserIcon size={14} style={{ marginRight: '0.35rem' }} /> <span>Account</span>
               </>
             ) : (
               <>
-                <KeyIcon size={14} style={{ marginRight: '0.4rem' }} /> Sign In
+                <KeyIcon size={14} style={{ marginRight: '0.35rem' }} /> <span>Sign In</span>
               </>
             )}
           </button>
 
           <button
-            className="btn-secondary"
-            style={{ fontSize: '0.82rem', padding: '0.42rem 0.85rem', display: 'inline-flex', alignItems: 'center' }}
+            className="btn-secondary btn-header-action"
             onClick={() => setShowHarness(!showHarness)}
           >
             {showHarness ? (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                <ArrowLeftIcon size={14} /> Back to App
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                <ArrowLeftIcon size={14} /> <span>App</span>
               </span>
             ) : (
               <>
-                <WrenchIcon size={14} style={{ marginRight: '0.4rem' }} /> DSP Harness
+                <WrenchIcon size={14} style={{ marginRight: '0.35rem' }} /> <span>DSP</span>
               </>
             )}
           </button>
@@ -209,7 +196,7 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   Swara Healing uses your device microphone to analyze pitch accuracy locally. Audio is processed entirely inside your browser and is never uploaded or recorded.
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                   <button className="btn-primary" onClick={() => send({ type: 'MIC_GRANTED' })}>
                     Grant Microphone Access
                   </button>
@@ -238,7 +225,7 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   {context.errorMessage || 'Unable to access microphone. Please enable mic permissions in your browser settings.'}
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                   <button className="btn-primary" onClick={() => send({ type: 'RETRY_PERMISSIONS' })}>
                     Try Again
                   </button>
@@ -265,7 +252,7 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   Room background noise was too high or microphone stream was interrupted.
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                   <button className="btn-primary" onClick={() => send({ type: 'RETRY_CALIBRATION' })}>
                     Retry Calibration
                   </button>
@@ -392,7 +379,7 @@ export const App: React.FC = () => {
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                   Audio recording or screen focus was interrupted. You can resume your session or discard it.
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                   <button className="btn-primary" onClick={() => send({ type: 'RESUME' })}>
                     Resume Session
                   </button>

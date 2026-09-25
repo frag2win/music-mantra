@@ -138,6 +138,7 @@ export const Listen: React.FC<ListenProps> = ({
 
       {/* Mantra Player Visual Card */}
       <div
+        className="mantra-player-card"
         style={{
           background: 'rgba(15, 23, 42, 0.75)',
           border: '2px solid var(--chakra-theme-accent, var(--accent-primary))',
@@ -151,7 +152,7 @@ export const Listen: React.FC<ListenProps> = ({
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
           {t('listen.seedMantra')}
         </div>
-        <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--chakra-theme-accent, var(--accent-primary))', margin: '0.5rem 0' }}>
+        <div className="mantra-large-display" style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--chakra-theme-accent, var(--accent-primary))', margin: '0.5rem 0' }}>
           "{t(`conditions.${detail.id}.mantra`)}"
         </div>
         <div style={{ fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>
@@ -209,7 +210,7 @@ export const Listen: React.FC<ListenProps> = ({
         <span>{t('listen.halfDuplex')}</span>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           className="btn-primary"
           style={{ fontSize: '1.05rem', padding: '0.95rem 2.6rem' }}

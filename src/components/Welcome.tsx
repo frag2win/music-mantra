@@ -34,8 +34,8 @@ export const Welcome: React.FC<WelcomeProps> = ({
 
   return (
     <div className="welcome-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
-      <header style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>
+      <header style={{ marginBottom: '1.5rem' }}>
+        <h1 className="welcome-title" style={{ fontSize: '2.2rem', marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>
           {t('welcome.title')}
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
@@ -45,8 +45,9 @@ export const Welcome: React.FC<WelcomeProps> = ({
 
       {/* Program Progress Ring / Display */}
       <div
+        className="welcome-progress-ring"
         style={{
-          margin: '2rem auto',
+          margin: '1.75rem auto',
           width: '180px',
           height: '180px',
           borderRadius: '50%',
@@ -62,7 +63,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
           Program Day
         </span>
-        <span style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+        <span className="welcome-ring-number" style={{ fontSize: '2.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
           {activeDay}
         </span>
         <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
@@ -70,7 +71,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
         </span>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.75rem' }}>
         {!disclaimerAccepted ? (
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', padding: '1rem', borderRadius: '16px 4px 16px 4px', color: '#fca5a5' }}>
             <p style={{ marginBottom: '0.75rem', fontWeight: 600 }}>Medical Disclaimer Required</p>
@@ -89,7 +90,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           className="btn-primary"
           style={{ fontSize: '1.05rem', padding: '0.95rem 2.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}

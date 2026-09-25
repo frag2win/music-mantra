@@ -112,7 +112,7 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
         <h3 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '0.85rem', textAlign: 'center', fontWeight: 600 }}>
           Manual Sa Override (Select any pitch class):
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.65rem' }}>
+        <div className="pitch-grid">
           {ALL_NOTES.map((note) => {
             const isSelected = note === currentSa;
             const freq = NOTE_BASE_FREQS[note];
@@ -156,7 +156,7 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
         </label>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.9rem 2.2rem' }} onClick={onConfirmScale}>
           Confirm Key & Pick Mantra
         </button>

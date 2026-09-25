@@ -121,7 +121,7 @@ export const Calibrate: React.FC<CalibrateProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
         {calibrationResult?.tooNoisy && (
           <button className="btn-primary" onClick={startCalibration}>
             Retry Noise Calibration

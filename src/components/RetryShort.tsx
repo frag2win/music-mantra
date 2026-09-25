@@ -36,7 +36,7 @@ export const RetryShort: React.FC<RetryShortProps> = ({ voicedSeconds, onAcknowl
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
         <button
           className="btn-primary"
           style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}

@@ -219,7 +219,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
       {/* Timer Display */}
       <div style={{ background: '#0f172a', border: '1px solid var(--chakra-theme-card-border, #334155)', borderRadius: '12px', padding: '1.25rem', maxWidth: '350px', margin: '0 auto 1.5rem auto' }}>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>COUNTDOWN REMAINING</div>
-        <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{formattedTime}</div>
+        <div className="countdown-display" style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{formattedTime}</div>
       </div>
 
       {/* Pitch Meter */}
@@ -260,7 +260,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+      <div className="screen-action-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
         <button className="btn-secondary" onClick={onPause}>
           Pause Session
         </button>

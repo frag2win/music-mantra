@@ -42,7 +42,7 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
       </p>
 
       {/* 3 Condition Cards Grid with Interactive Theme Previews */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div className="conditions-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         {conditions.map((item) => {
           const chakraTheme = CHAKRA_THEMES[item.id];
           const targetHz = selectedSaHz * item.ratio;
@@ -187,7 +187,7 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
         })}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+      <div className="screen-action-group" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
         {onBack && (
           <button
             type="button"
