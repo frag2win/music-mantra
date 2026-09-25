@@ -1,7 +1,15 @@
 /* ============================================================
-   Lotus Intro — Cinematic Full-Screen Entry Animation  v2
-   Smooth, detailed, covers entire viewport.
+   Lotus Intro v3 — Butter-smooth GPU-composited animation
+   
+   PERF RULES:
+   • Every animation uses ONLY transform + opacity (GPU composited)
+   • All animated elements have will-change + backface-visibility
+   • translate3d(0,0,0) forces dedicated GPU layers
+   • No filter animations, no layout thrashing
+   • Reduced DOM count for less compositing overhead
    ============================================================ */
+
+/* ---- Overlay ---- */
 
 .lotus-intro-overlay {
   position: fixed;
@@ -12,80 +20,104 @@
   justify-content: center;
   overflow: hidden;
   background: radial-gradient(ellipse at 50% 65%, #1a0a20 0%, #0d0618 40%, #050210 100%);
-  opacity: 1;
-  will-change: opacity;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* GPU layer */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.lotus-intro-overlay.fade-out {
+/* ---- Phase: bright bloom before exit ---- */
+
+.lotus-intro-overlay .bright-wash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(253, 230, 138, 0.0) 0%,
+    rgba(245, 200, 100, 0.0) 40%,
+    rgba(180, 60, 100, 0.0) 100%
+  );
   opacity: 0;
+  transform: translateZ(0) scale(1);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
   pointer-events: none;
+  transition: none;
 }
 
-/* ---- Ambient atmospheric mist ---- */
+.lotus-intro-overlay.phase-brightening .bright-wash {
+  animation: brightWash 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes brightWash {
+  0%   { opacity: 0;   transform: translateZ(0) scale(0.3); background: radial-gradient(circle at 50% 50%, rgba(253, 230, 138, 0.4) 0%, rgba(245, 200, 100, 0.2) 40%, transparent 70%); }
+  40%  { opacity: 0.8; transform: translateZ(0) scale(1.0); }
+  70%  { opacity: 1;   transform: translateZ(0) scale(1.5); }
+  100% { opacity: 1;   transform: translateZ(0) scale(3.0); background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(253, 245, 230, 0.9) 40%, rgba(253, 230, 200, 0.85) 100%); }
+}
+
+/* ---- Phase: final reveal ---- */
+
+.lotus-intro-overlay.phase-revealing {
+  animation: overlayReveal 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes overlayReveal {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- Ambient atmospheric mist (GPU) ---- */
 
 .lotus-mist {
   position: absolute;
-  inset: 0;
+  inset: -10%;
   background:
     radial-gradient(ellipse 120% 60% at 30% 80%, rgba(100, 40, 80, 0.12) 0%, transparent 70%),
     radial-gradient(ellipse 100% 50% at 70% 75%, rgba(60, 20, 60, 0.10) 0%, transparent 65%);
-  animation: mistDrift 12s ease-in-out infinite alternate;
+  transform: translateZ(0) translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  animation: mistDrift 14s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
 @keyframes mistDrift {
-  0%   { transform: translateX(-3%) translateY(0); opacity: 0.6; }
-  100% { transform: translateX(3%) translateY(-2%); opacity: 1; }
+  0%   { transform: translateZ(0) translate3d(-2%, 0, 0);  opacity: 0.5; }
+  100% { transform: translateZ(0) translate3d(2%, -1%, 0); opacity: 0.9; }
 }
 
-/* ---- Falling Petal Particles ---- */
+/* ---- Falling Petal Particles (GPU) ---- */
 
 .petal-particle {
   position: absolute;
-  top: -8vh;
-  width: var(--petal-size, 14px);
-  height: calc(var(--petal-size, 14px) * 1.5);
+  top: -6vh;
+  width: var(--p-sz, 14px);
+  height: calc(var(--p-sz, 14px) * 1.4);
   opacity: 0;
   pointer-events: none;
+  transform: translateZ(0);
   will-change: transform, opacity;
-  animation: petalFall var(--fall-duration, 6s) var(--fall-delay, 0s) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  backface-visibility: hidden;
+  animation: petalDrift var(--p-dur, 7s) var(--p-del, 0s) cubic-bezier(0.35, 0, 0.25, 1) forwards;
 }
 
 .petal-particle svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 2px 6px rgba(180, 60, 100, 0.35));
 }
 
-@keyframes petalFall {
-  0% {
-    opacity: 0;
-    transform: translateY(0) translateX(0) rotate(var(--start-rot, 0deg)) scale(0.4);
-  }
-  6% {
-    opacity: 0.8;
-    transform: translateY(3vh) translateX(var(--sway-a, 8px)) rotate(calc(var(--start-rot, 0deg) + 20deg)) scale(0.7);
-  }
-  25% {
-    opacity: 0.75;
-    transform: translateY(25vh) translateX(var(--sway-b, -15px)) rotate(calc(var(--start-rot, 0deg) + 90deg)) scale(0.85);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateY(50vh) translateX(var(--sway-c, 20px)) rotate(calc(var(--start-rot, 0deg) + 200deg)) scale(0.9);
-  }
-  75% {
-    opacity: 0.35;
-    transform: translateY(78vh) translateX(var(--sway-d, -12px)) rotate(calc(var(--start-rot, 0deg) + 300deg)) scale(0.75);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(108vh) translateX(var(--sway-e, 5px)) rotate(calc(var(--start-rot, 0deg) + 380deg)) scale(0.5);
-  }
+/* 8-keyframe drift for silky-smooth motion */
+@keyframes petalDrift {
+  0%    { opacity: 0;    transform: translateZ(0) translate3d(0, 0, 0)                         rotate(var(--p-r0, 0deg))    scale(0.35); }
+  5%    { opacity: 0.75; transform: translateZ(0) translate3d(var(--sw1, 5px), 4vh, 0)          rotate(var(--p-r1, 25deg))   scale(0.6); }
+  15%   { opacity: 0.8;  transform: translateZ(0) translate3d(var(--sw2, -10px), 14vh, 0)       rotate(var(--p-r2, 70deg))   scale(0.75); }
+  30%   { opacity: 0.7;  transform: translateZ(0) translate3d(var(--sw3, 15px), 30vh, 0)        rotate(var(--p-r3, 140deg))  scale(0.85); }
+  50%   { opacity: 0.55; transform: translateZ(0) translate3d(var(--sw4, -8px), 50vh, 0)        rotate(var(--p-r4, 220deg))  scale(0.88); }
+  70%   { opacity: 0.35; transform: translateZ(0) translate3d(var(--sw5, 12px), 72vh, 0)        rotate(var(--p-r5, 290deg))  scale(0.78); }
+  88%   { opacity: 0.12; transform: translateZ(0) translate3d(var(--sw6, -5px), 92vh, 0)        rotate(var(--p-r6, 345deg))  scale(0.6); }
+  100%  { opacity: 0;    transform: translateZ(0) translate3d(var(--sw7, 3px), 110vh, 0)        rotate(var(--p-r7, 390deg))  scale(0.4); }
 }
 
-/* ---- Full-screen Lotus SVG ---- */
+/* ---- Full-screen Lotus SVG (GPU) ---- */
 
 .lotus-svg-wrapper {
   position: absolute;
@@ -94,97 +126,100 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .lotus-main-svg {
-  width: 110vmin;
-  height: 110vmin;
+  width: 115vmin;
+  height: 115vmin;
   max-width: none;
   opacity: 0;
-  transform: scale(0.15);
+  transform: translateZ(0) scale(0.1);
   will-change: transform, opacity;
-  animation: lotusAppear 3.5s 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  backface-visibility: hidden;
+  /* Smooth 10-keyframe entrance */
+  animation: lotusEnter 4s 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Static filter applied once — not animated */
+.lotus-main-svg {
   filter:
-    drop-shadow(0 0 40px rgba(180, 60, 100, 0.4))
-    drop-shadow(0 0 80px rgba(219, 112, 147, 0.2));
+    drop-shadow(0 0 30px rgba(180, 60, 100, 0.3))
+    drop-shadow(0 0 60px rgba(219, 112, 147, 0.15));
 }
 
-@keyframes lotusAppear {
-  0%   { opacity: 0; transform: scale(0.15); }
-  15%  { opacity: 0.6; transform: scale(0.35); }
-  40%  { opacity: 0.9; transform: scale(0.65); }
-  70%  { opacity: 1;   transform: scale(0.88); }
-  85%  { opacity: 1;   transform: scale(0.96); }
-  100% { opacity: 1;   transform: scale(1); }
+@keyframes lotusEnter {
+  0%    { opacity: 0;    transform: translateZ(0) scale(0.1); }
+  8%    { opacity: 0.3;  transform: translateZ(0) scale(0.2); }
+  20%   { opacity: 0.6;  transform: translateZ(0) scale(0.38); }
+  35%   { opacity: 0.8;  transform: translateZ(0) scale(0.55); }
+  50%   { opacity: 0.92; transform: translateZ(0) scale(0.7); }
+  65%   { opacity: 0.97; transform: translateZ(0) scale(0.82); }
+  78%   { opacity: 1;    transform: translateZ(0) scale(0.92); }
+  88%   { opacity: 1;    transform: translateZ(0) scale(0.97); }
+  95%   { opacity: 1;    transform: translateZ(0) scale(0.995); }
+  100%  { opacity: 1;    transform: translateZ(0) scale(1); }
 }
 
-/* Final bloom: lotus scales to fill + beyond */
-.lotus-main-svg.bloom-expand {
-  animation: lotusBloomExpand 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+/* Brightening phase — lotus gently grows and brightens */
+.lotus-main-svg.phase-bright {
+  animation: lotusBright 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes lotusBloomExpand {
-  0%   { transform: scale(1);   opacity: 1; }
-  40%  { transform: scale(2.5); opacity: 0.9; }
-  70%  { transform: scale(5);   opacity: 0.5; }
-  100% { transform: scale(9);   opacity: 0; }
+@keyframes lotusBright {
+  0%   { opacity: 1;    transform: translateZ(0) scale(1); }
+  30%  { opacity: 1;    transform: translateZ(0) scale(1.15); }
+  60%  { opacity: 0.85; transform: translateZ(0) scale(1.5); }
+  85%  { opacity: 0.4;  transform: translateZ(0) scale(2.2); }
+  100% { opacity: 0;    transform: translateZ(0) scale(3.5); }
 }
 
-/* ---- Individual Petal Animation ----
-   Each petal rotates from closed (pointing up, scaleY compressed)
-   to open (fanned out, full size). The transform-origin sits at
-   the base of each petal so they hinge naturally.               */
+/* ---- Individual Petal Animation (GPU) ----
+   Hinges from base with smooth organic rotation.
+   8 keyframes for maximum smoothness.            */
 
 .lotus-petal {
   opacity: 0;
+  transform: translateZ(0);
   will-change: transform, opacity;
-  transform-origin: var(--petal-origin-x, 50%) var(--petal-origin-y, 95%);
+  backface-visibility: hidden;
+  transform-origin: 50% 100%;
   animation:
-    petalOpen var(--petal-dur, 2.5s) var(--petal-delay, 3s) cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    petalUnfurl var(--pt-dur, 3s) var(--pt-del, 3s) cubic-bezier(0.22, 0.9, 0.32, 1) forwards;
 }
 
-@keyframes petalOpen {
-  0% {
-    opacity: 0;
-    transform: rotate(var(--petal-closed-rot, 0deg)) scaleY(0.2) scaleX(0.6);
-  }
-  15% {
-    opacity: 0.7;
-    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.7)) scaleY(0.4) scaleX(0.75);
-  }
-  40% {
-    opacity: 0.9;
-    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.35)) scaleY(0.65) scaleX(0.88);
-  }
-  65% {
-    opacity: 1;
-    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.1)) scaleY(0.85) scaleX(0.96);
-  }
-  85% {
-    transform: rotate(calc(var(--petal-closed-rot, 0deg) * -0.02)) scaleY(1.02) scaleX(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: rotate(0deg) scaleY(1) scaleX(1);
-  }
+@keyframes petalUnfurl {
+  0%    { opacity: 0;    transform: translateZ(0) rotate(var(--pt-rot, 20deg)) scaleY(0.15) scaleX(0.5); }
+  8%    { opacity: 0.5;  transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.85)) scaleY(0.25) scaleX(0.6); }
+  20%   { opacity: 0.75; transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.65)) scaleY(0.4)  scaleX(0.72); }
+  35%   { opacity: 0.88; transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.42)) scaleY(0.58) scaleX(0.82); }
+  50%   { opacity: 0.95; transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.22)) scaleY(0.73) scaleX(0.9); }
+  68%   { opacity: 1;    transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.08)) scaleY(0.87) scaleX(0.96); }
+  82%   { opacity: 1;    transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * -0.02)) scaleY(0.96) scaleX(1.01); }
+  92%   { opacity: 1;    transform: translateZ(0) rotate(calc(var(--pt-rot, 20deg) * 0.005)) scaleY(1.01) scaleX(1.005); }
+  100%  { opacity: 1;    transform: translateZ(0) rotate(0deg) scaleY(1) scaleX(1); }
 }
 
-/* Core golden center */
+/* Core bloom (GPU) */
 .lotus-core-group {
   opacity: 0;
-  transform: scale(0);
+  transform: translateZ(0) scale(0);
   will-change: transform, opacity;
-  animation: coreBloom 2s var(--core-delay, 4.8s) cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+  backface-visibility: hidden;
+  animation: corePop 2.2s var(--c-del, 5.5s) cubic-bezier(0.22, 0.9, 0.32, 1) forwards;
 }
 
-@keyframes coreBloom {
-  0%   { opacity: 0; transform: scale(0); }
-  40%  { opacity: 1; transform: scale(1.1); }
-  70%  { transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+@keyframes corePop {
+  0%   { opacity: 0; transform: translateZ(0) scale(0); }
+  25%  { opacity: 0.8; transform: translateZ(0) scale(0.7); }
+  50%  { opacity: 1; transform: translateZ(0) scale(1.08); }
+  70%  { transform: translateZ(0) scale(0.96); }
+  85%  { transform: translateZ(0) scale(1.02); }
+  100% { opacity: 1; transform: translateZ(0) scale(1); }
 }
 
-/* ---- Radiance behind lotus ---- */
+/* ---- Radiance behind lotus (GPU) ---- */
 
 .lotus-back-radiance {
   position: absolute;
@@ -192,81 +227,62 @@
   height: 100vmin;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(245, 158, 11, 0.18) 0%,
-    rgba(219, 112, 147, 0.10) 25%,
-    rgba(139, 34, 82, 0.05) 50%,
-    transparent 70%
+    rgba(245, 158, 11, 0.16) 0%,
+    rgba(219, 112, 147, 0.08) 30%,
+    transparent 65%
   );
   opacity: 0;
-  will-change: opacity, transform;
-  animation: radiancePulse 4s 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform: translateZ(0) scale(0.3);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  animation: radianceIn 3.5s 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   pointer-events: none;
 }
 
-@keyframes radiancePulse {
-  0%   { opacity: 0; transform: scale(0.4); }
-  50%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0.7; transform: scale(1.15); }
+@keyframes radianceIn {
+  0%   { opacity: 0;   transform: translateZ(0) scale(0.3); }
+  40%  { opacity: 0.8; transform: translateZ(0) scale(0.8); }
+  70%  { opacity: 1;   transform: translateZ(0) scale(1.05); }
+  100% { opacity: 0.65; transform: translateZ(0) scale(1.15); }
 }
 
-/* Slow-rotating light rays */
+/* Slow-rotating light rays (GPU) */
 .lotus-light-rays {
   position: absolute;
   width: 130vmin;
   height: 130vmin;
   opacity: 0;
-  background:
-    conic-gradient(from 0deg at 50% 50%,
-      transparent 0deg,
-      rgba(245, 200, 100, 0.04) 8deg,
-      transparent 16deg,
-      rgba(219, 160, 180, 0.035) 24deg,
-      transparent 32deg,
-      rgba(245, 200, 100, 0.04) 40deg,
-      transparent 48deg,
-      rgba(219, 160, 180, 0.035) 56deg,
-      transparent 64deg,
-      rgba(245, 200, 100, 0.04) 72deg,
-      transparent 80deg,
-      rgba(219, 160, 180, 0.035) 88deg,
-      transparent 96deg,
-      rgba(245, 200, 100, 0.04) 104deg,
-      transparent 112deg,
-      rgba(219, 160, 180, 0.035) 120deg,
-      transparent 128deg,
-      rgba(245, 200, 100, 0.04) 136deg,
-      transparent 144deg,
-      rgba(219, 160, 180, 0.035) 152deg,
-      transparent 160deg,
-      rgba(245, 200, 100, 0.04) 168deg,
-      transparent 176deg,
-      rgba(219, 160, 180, 0.035) 184deg,
-      transparent 192deg,
-      rgba(245, 200, 100, 0.04) 200deg,
-      transparent 208deg,
-      rgba(219, 160, 180, 0.035) 216deg,
-      transparent 224deg,
-      rgba(245, 200, 100, 0.04) 232deg,
-      transparent 240deg,
-      rgba(219, 160, 180, 0.035) 248deg,
-      transparent 256deg,
-      rgba(245, 200, 100, 0.04) 264deg,
-      transparent 272deg,
-      rgba(219, 160, 180, 0.035) 280deg,
-      transparent 288deg,
-      rgba(245, 200, 100, 0.04) 296deg,
-      transparent 304deg,
-      rgba(219, 160, 180, 0.035) 312deg,
-      transparent 320deg,
-      rgba(245, 200, 100, 0.04) 328deg,
-      transparent 336deg,
-      rgba(219, 160, 180, 0.035) 344deg,
-      transparent 352deg,
-      rgba(245, 200, 100, 0.04) 360deg
-    );
+  transform: translateZ(0) rotate(0deg);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  background: conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg,   rgba(245, 200, 100, 0.035) 8deg,
+    transparent 16deg,  rgba(219, 160, 180, 0.03)  24deg,
+    transparent 32deg,  rgba(245, 200, 100, 0.035) 40deg,
+    transparent 48deg,  rgba(219, 160, 180, 0.03)  56deg,
+    transparent 64deg,  rgba(245, 200, 100, 0.035) 72deg,
+    transparent 80deg,  rgba(219, 160, 180, 0.03)  88deg,
+    transparent 96deg,  rgba(245, 200, 100, 0.035) 104deg,
+    transparent 112deg, rgba(219, 160, 180, 0.03)  120deg,
+    transparent 128deg, rgba(245, 200, 100, 0.035) 136deg,
+    transparent 144deg, rgba(219, 160, 180, 0.03)  152deg,
+    transparent 160deg, rgba(245, 200, 100, 0.035) 168deg,
+    transparent 176deg, rgba(219, 160, 180, 0.03)  184deg,
+    transparent 192deg, rgba(245, 200, 100, 0.035) 200deg,
+    transparent 208deg, rgba(219, 160, 180, 0.03)  216deg,
+    transparent 224deg, rgba(245, 200, 100, 0.035) 232deg,
+    transparent 240deg, rgba(219, 160, 180, 0.03)  248deg,
+    transparent 256deg, rgba(245, 200, 100, 0.035) 264deg,
+    transparent 272deg, rgba(219, 160, 180, 0.03)  280deg,
+    transparent 288deg, rgba(245, 200, 100, 0.035) 296deg,
+    transparent 304deg, rgba(219, 160, 180, 0.03)  312deg,
+    transparent 320deg, rgba(245, 200, 100, 0.035) 328deg,
+    transparent 336deg, rgba(219, 160, 180, 0.03)  344deg,
+    transparent 352deg, rgba(245, 200, 100, 0.035) 360deg
+  );
   animation:
-    raysIn 3s 4s ease-out forwards,
-    raysRotate 30s 4s linear infinite;
+    raysIn 2.5s 4s ease-out forwards,
+    raysRotate 35s 4s linear infinite;
   pointer-events: none;
 }
 
@@ -276,38 +292,51 @@
 }
 
 @keyframes raysRotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from { transform: translateZ(0) rotate(0deg); }
+  to   { transform: translateZ(0) rotate(360deg); }
 }
 
-/* ---- Floating golden pollen ---- */
+/* ---- Floating pollen (GPU) ---- */
 
 .pollen-dot {
   position: absolute;
-  width: var(--dot-size, 3px);
-  height: var(--dot-size, 3px);
+  width: var(--d-sz, 3px);
+  height: var(--d-sz, 3px);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 210, 90, 0.9) 0%, rgba(245, 180, 60, 0.4) 100%);
-  box-shadow: 0 0 6px rgba(245, 200, 80, 0.5);
+  background: radial-gradient(circle, rgba(245, 210, 90, 0.85) 0%, rgba(245, 180, 60, 0.3) 100%);
   opacity: 0;
   pointer-events: none;
+  transform: translateZ(0);
   will-change: transform, opacity;
-  animation: pollenDrift var(--dot-dur, 5s) var(--dot-delay, 5s) ease-in-out infinite;
+  backface-visibility: hidden;
+  animation: pollenFloat var(--d-dur, 5s) var(--d-del, 5.5s) ease-in-out infinite;
 }
 
-@keyframes pollenDrift {
-  0%   { opacity: 0;   transform: translate(0, 0) scale(0.5); }
-  15%  { opacity: 0.9; transform: translate(var(--dx1, 5px), var(--dy1, -8px)) scale(1); }
-  50%  { opacity: 0.6; transform: translate(var(--dx2, 15px), var(--dy2, -25px)) scale(0.8); }
-  85%  { opacity: 0.3; transform: translate(var(--dx3, -5px), var(--dy3, -40px)) scale(0.6); }
-  100% { opacity: 0;   transform: translate(var(--dx4, 0px), var(--dy4, -55px)) scale(0.4); }
+@keyframes pollenFloat {
+  0%   { opacity: 0;   transform: translateZ(0) translate3d(0, 0, 0) scale(0.4); }
+  12%  { opacity: 0.85; transform: translateZ(0) translate3d(var(--dx1, 4px), var(--dy1, -6px), 0) scale(0.9); }
+  35%  { opacity: 0.7;  transform: translateZ(0) translate3d(var(--dx2, 12px), var(--dy2, -20px), 0) scale(1); }
+  60%  { opacity: 0.45; transform: translateZ(0) translate3d(var(--dx3, -3px), var(--dy3, -35px), 0) scale(0.75); }
+  85%  { opacity: 0.15; transform: translateZ(0) translate3d(var(--dx4, -8px), var(--dy4, -48px), 0) scale(0.5); }
+  100% { opacity: 0;    transform: translateZ(0) translate3d(var(--dx4, -8px), var(--dy4, -55px), 0) scale(0.3); }
+}
+
+/* ---- Dashboard entrance transition ---- */
+
+.dashboard-entrance {
+  animation: dashboardFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes dashboardFadeIn {
+  0%   { opacity: 0; transform: translateZ(0) translateY(12px); }
+  100% { opacity: 1; transform: translateZ(0) translateY(0); }
 }
 
 /* ---- Responsive ---- */
 
 @media (max-width: 600px) {
   .lotus-main-svg {
-    width: 140vmin;
-    height: 140vmin;
+    width: 145vmin;
+    height: 145vmin;
   }
 }
