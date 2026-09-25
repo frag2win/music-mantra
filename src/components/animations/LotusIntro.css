@@ -127,16 +127,7 @@
   100% { opacity: 1; transform: translateZ(0) scale(1); }
 }
 
-/* ---- Dashboard entrance ---- */
 
-.dashboard-entrance {
-  animation: dashIn 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes dashIn {
-  0%   { opacity: 0; transform: translateZ(0) translateY(10px); }
-  100% { opacity: 1; transform: translateZ(0) translateY(0); }
-}
 
 /* ---- Responsive ---- */
 

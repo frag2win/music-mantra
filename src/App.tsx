@@ -44,7 +44,7 @@ import {
 
 export const App: React.FC = () => {
   const { t } = useI18n();
-  const { shouldShow: showIntro, handleComplete: handleIntroComplete, dashboardEntrance } = useLotusIntro();
+  const { shouldShow: showIntro, handleComplete: handleIntroComplete } = useLotusIntro();
 
   // Load and hydrate persisted context and navigation state
   const initialContext = React.useMemo(() => loadPersistedContext(INITIAL_CONTEXT), []);
@@ -93,7 +93,7 @@ export const App: React.FC = () => {
 
       {/* Full-viewport ambient background sitting behind all screens at 60fps */}
       <ChakraBackdrop variant="fullscreen" />
-      <div className={dashboardEntrance ? 'dashboard-entrance' : ''} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Top Navbar */}
       <header className="app-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

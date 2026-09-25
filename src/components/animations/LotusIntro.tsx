@@ -230,16 +230,13 @@ export function useLotusIntro() {
     if (typeof window === 'undefined') return false;
     return !sessionStorage.getItem(SESSION_KEY);
   });
-  const [dashboardEntrance, setDashboardEntrance] = React.useState(false);
 
   const handleComplete = React.useCallback(() => {
     sessionStorage.setItem(SESSION_KEY, '1');
     setShouldShow(false);
-    setDashboardEntrance(true);
-    setTimeout(() => setDashboardEntrance(false), 1000);
   }, []);
 
-  return { shouldShow, handleComplete, dashboardEntrance };
+  return { shouldShow, handleComplete };
 }
 
 export default LotusIntro;
