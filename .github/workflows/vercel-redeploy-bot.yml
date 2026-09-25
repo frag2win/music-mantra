@@ -1,0 +1,45 @@
+name: Vercel Deploy Bot
+
+on:
+  push:
+    branches:
+      - main
+
+# Give the bot permission to push code back to the repository
+permissions:
+  contents: write
+
+jobs:
+  auto-trigger-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # We need to use the default token to push, and fetch-depth 2 to see the commit history
+          fetch-depth: 2
+          
+      - name: Check commit author and trigger deploy
+        run: |
+          # Get the author of the latest commit
+          AUTHOR=$(git log -1 --pretty=format:'%an')
+          
+          echo "Latest commit was made by: $AUTHOR"
+          
+          # If the author is NOT you (frag2win), Vercel might ignore it.
+          # So we create an empty commit pretending to be you to force Vercel to build it!
+          if [[ "$AUTHOR" != "frag2win" ]] && [[ "$AUTHOR" != "Vercel Deploy Bot" ]]; then
+            echo "Teammate commit detected! Forcing a Vercel deploy..."
+            
+            # Impersonate your GitHub account
+            git config --global user.name "frag2win"
+            git config --global user.email "shubhmapawar@gmail.com"
+            
+            # Create a dummy commit. 
+            # The [skip actions] tag tells GitHub Actions NOT to run this workflow again (preventing an infinite loop).
+            # But Vercel ignores that tag by default and WILL deploy it!
+            git commit --allow-empty -m "chore: force vercel deploy for teammate update [skip actions]"
+            git push
+          else
+            echo "Commit is already from you. Vercel will deploy it automatically!"
+          fi
