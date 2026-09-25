@@ -21,6 +21,12 @@ export default defineConfig({
     },
   ],
 
+  server: {
+    watch: {
+      ignored: ['**/public/mantras/**'],
+    },
+  },
+
   // Allow AudioWorklet files to be served correctly
   worker: {
     format: 'es',

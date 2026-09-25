@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { apiClient } from '../api/client';
+import { useI18n } from '../i18n/I18nContext';
 
 interface WelcomeProps {
   activeDay: number;
@@ -18,9 +19,12 @@ export const Welcome: React.FC<WelcomeProps> = ({
   onStartProgram,
   onViewHistory
 }) => {
+  const { t } = useI18n();
   const [showModal, setShowModal] = useState(!disclaimerAccepted);
+  const [ageConfirmed, setAgeConfirmed] = useState(true);
 
   const handleModalAccept = () => {
+    if (!ageConfirmed) return;
     onAcceptDisclaimer();
     setShowModal(false);
   };
@@ -31,10 +35,10 @@ export const Welcome: React.FC<WelcomeProps> = ({
     <div className="welcome-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
       <header style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', color: 'var(--accent-primary)' }}>
-          Swara Healing — Music Mantra
+          {t('welcome.title')}
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
-          Browser-Based Guided Chakra Sound Therapy & Pitch-Tracked Chanting
+          {t('welcome.tagline')}
         </p>
       </header>
 
@@ -127,8 +131,27 @@ export const Welcome: React.FC<WelcomeProps> = ({
               </p>
             </div>
 
+            <div style={{ margin: '1rem 0', background: 'rgba(30, 41, 59, 0.6)', padding: '0.75rem', borderRadius: '8px', border: '1px solid #334155' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', cursor: 'pointer', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                <input
+                  type="checkbox"
+                  checked={ageConfirmed}
+                  onChange={(e) => setAgeConfirmed(e.target.checked)}
+                  style={{ marginTop: '0.2rem' }}
+                />
+                <span>
+                  {t('welcome.ageDeclaration')}
+                </span>
+              </label>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-              <button className="btn-primary" onClick={handleModalAccept}>
+              <button
+                className="btn-primary"
+                onClick={handleModalAccept}
+                disabled={!ageConfirmed}
+                style={{ opacity: ageConfirmed ? 1 : 0.5, cursor: ageConfirmed ? 'pointer' : 'not-allowed' }}
+              >
                 I Understand & Accept
               </button>
             </div>

@@ -276,32 +276,59 @@ export class AudioEngine {
 
   /**
    * Load a mantra audio file into an AudioBuffer for playback.
-   * If recorded audio file is missing or fails to fetch, gracefully falls back
+   * If recorded audio file is missing or fails to fetch/decode, gracefully falls back
    * to generating an authentic harmonic Tanpura + Swara drone buffer.
    */
   async loadMantra(url: string, fallbackOptions?: SynthMantraOptions): Promise<void> {
     if (!this.audioContext) {
-      this.events.onError?.(new Error('AudioContext not initialized.'));
-      return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        this.audioContext = new AudioCtx();
+      } else {
+        this.events.onError?.(new Error('AudioContext is not supported by this browser.'));
+        return;
+      }
     }
 
     await this.resumeContext();
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} loading ${url}`);
+    // Prepare candidate URLs (trying .mp3, .mpeg, and original url)
+    const candidates: string[] = [url];
+    if (url.endsWith('.m4a')) {
+      candidates.unshift(url.replace(/\.m4a$/, '.mpeg'));
+      candidates.unshift(url.replace(/\.m4a$/, '.mp3'));
+    } else if (url.endsWith('.mpeg')) {
+      candidates.unshift(url.replace(/\.mpeg$/, '.mp3'));
+    }
+
+    let decoded: AudioBuffer | null = null;
+    let lastError: Error | null = null;
+
+    for (const candidate of candidates) {
+      try {
+        const response = await fetch(candidate);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} loading ${candidate}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        decoded = await this.audioContext.decodeAudioData(arrayBuffer);
+        if (decoded) {
+          console.info(`[AudioEngine] Successfully loaded and decoded audio: ${candidate} (${decoded.duration.toFixed(2)}s)`);
+          break;
+        }
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
       }
-      const arrayBuffer = await response.arrayBuffer();
-      this.mantraBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-    } catch (err) {
+    }
+
+    if (decoded) {
+      this.mantraBuffer = decoded;
+    } else {
       if (fallbackOptions) {
-        console.warn(`[AudioEngine] Mantra file ${url} unavailable, generating authentic harmonic drone fallback:`, err);
+        console.warn(`[AudioEngine] Studio mantra file unavailable (${lastError?.message}), using harmonic Tanpura drone fallback.`);
         this.mantraBuffer = generateHarmonicMantraBuffer(this.audioContext, fallbackOptions);
       } else {
-        this.events.onError?.(
-          err instanceof Error ? err : new Error(`Failed to load mantra: ${url}`)
-        );
+        this.events.onError?.(lastError || new Error(`Failed to load mantra from ${url}`));
       }
     }
   }
@@ -311,6 +338,13 @@ export class AudioEngine {
    * Enforces half-duplex: stops mic listening before playing.
    */
   playMantra(): void {
+    if (!this.audioContext) {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        this.audioContext = new AudioCtx();
+      }
+    }
+
     if (!this.audioContext || !this.mantraBuffer) {
       this.events.onError?.(new Error('No mantra loaded.'));
       return;
@@ -319,10 +353,22 @@ export class AudioEngine {
     // Enforce half-duplex: stop listening before playing
     this.stopListening();
 
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume().catch(() => {});
+    }
+
+    // Stop existing playback node if still active
+    this.stopPlayback();
+
     this.mantraSourceNode = this.audioContext.createBufferSource();
     this.mantraSourceNode.buffer = this.mantraBuffer;
     this.mantraSourceNode.loop = true;
-    this.mantraSourceNode.connect(this.audioContext.destination);
+
+    const gainNode = this.audioContext.createGain();
+    gainNode.gain.setValueAtTime(1.0, this.audioContext.currentTime);
+
+    this.mantraSourceNode.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
 
     this.mantraSourceNode.onended = () => {
       this.events.onPlaybackStopped?.();
@@ -331,8 +377,9 @@ export class AudioEngine {
       }
     };
 
-    this.mantraSourceNode.start();
+    this.mantraSourceNode.start(0);
     this.setState('playing');
+    console.info('[AudioEngine] Mantra playback started.');
   }
 
   /**

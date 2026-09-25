@@ -19,6 +19,8 @@ export const Listen: React.FC<ListenProps> = ({
   onChangeCondition
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const engineRef = React.useRef<AudioEngine | null>(null);
   const detail = CONDITION_DETAILS[condition];
   const targetHz = saHz * detail.ratio;
@@ -26,6 +28,12 @@ export const Listen: React.FC<ListenProps> = ({
   useEffect(() => {
     const engine = new AudioEngine({
       onPlaybackStopped: () => setIsPlaying(false),
+      onError: (err) => {
+        console.error('[Listen] AudioEngine error:', err);
+        setPlaybackError(err.message);
+        setIsPlaying(false);
+        setIsLoading(false);
+      },
     });
     engineRef.current = engine;
 
@@ -54,20 +62,31 @@ export const Listen: React.FC<ListenProps> = ({
       engineRef.current.stopPlayback();
       setIsPlaying(false);
     } else {
-      // Half-duplex enforcement
-      engineRef.current.stopListening();
+      setPlaybackError(null);
+      setIsLoading(true);
 
-      const noteSlug = saNote.replace('#', 'sharp');
-      const audioUrl = `/mantras/${condition}/${noteSlug}-low.m4a`;
+      try {
+        // Half-duplex enforcement: ensure mic listening is stopped
+        engineRef.current.stopListening();
 
-      await engineRef.current.loadMantra(audioUrl, {
-        saHz,
-        targetHz,
-        condition,
-      });
+        const noteSlug = saNote.replace('#', 'sharp');
+        const register = saHz >= 220 ? 'high' : 'low';
+        const audioUrl = `/mantras/${condition}/${noteSlug}-${register}.mp3`;
 
-      engineRef.current.playMantra();
-      setIsPlaying(true);
+        await engineRef.current.loadMantra(audioUrl, {
+          saHz,
+          targetHz,
+          condition,
+        });
+
+        engineRef.current.playMantra();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('[Listen] Failed to play mantra:', err);
+        setPlaybackError(err instanceof Error ? err.message : 'Failed to play audio');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -118,9 +137,16 @@ export const Listen: React.FC<ListenProps> = ({
             backgroundColor: isPlaying ? 'var(--danger)' : `var(--chakra-${detail.id})`
           }}
           onClick={handleTogglePlayback}
+          disabled={isLoading}
         >
-          {isPlaying ? '⏹ Stop Mantra Playback' : '▶ Play Reference Mantra Loop'}
+          {isLoading ? '⏳ Loading Audio...' : isPlaying ? '⏹ Stop Mantra Playback' : '▶ Play Reference Mantra Loop'}
         </button>
+
+        {playbackError && (
+          <div style={{ color: 'var(--danger)', fontSize: '0.85rem', marginTop: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '6px' }}>
+            ⚠️ {playbackError}
+          </div>
+        )}
 
         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
           {isPlaying ? '🎵 Playing gapless reference audio... Listen closely to pitch and tone.' : 'Click to listen to the mantra audio loop.'}

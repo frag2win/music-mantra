@@ -17,8 +17,10 @@ import DspTestHarness from './components/DspTestHarness';
 import { AuthModal } from './components/common/AuthModal';
 import { BetaFeedbackModal } from './components/common/BetaFeedbackModal';
 import { apiClient } from './api/client';
+import { useI18n, LanguageSwitcher } from './i18n/I18nContext';
 
 export const App: React.FC = () => {
+  const { t } = useI18n();
   const [snapshot, send] = useMachine(appMachine);
   const [showHarness, setShowHarness] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
@@ -45,17 +47,19 @@ export const App: React.FC = () => {
           <span style={{ fontSize: '1.5rem' }}>🧘</span>
           <div>
             <h1 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
-              Swara Healing
+              {t('app.title')}
             </h1>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              Chakra Music Mantra Therapy (Web v0.2)
+              {t('app.subtitle')}
             </span>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <LanguageSwitcher />
+
           <div style={{ background: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #334155' }}>
-            Day {context.activeDay} of {context.totalProgramDays}
+            {t('app.dayProgress', { day: context.activeDay })}
           </div>
 
           <button
@@ -293,9 +297,25 @@ export const App: React.FC = () => {
         onClose={() => setShowBetaModal(false)}
       />
 
-      {/* Footer */}
-      <footer style={{ marginTop: '2rem', padding: '1rem 0', borderTop: '1px solid #334155', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        Music Mantra — Swara Healing Web · Client-Side DSP Engine · Confidential & Private
+      {/* Persistent Medical Disclaimer & Footer */}
+      <footer
+        role="contentinfo"
+        style={{
+          marginTop: '2rem',
+          padding: '1.25rem 1rem',
+          borderTop: '1px solid #334155',
+          textAlign: 'center',
+          fontSize: '0.8rem',
+          color: 'var(--text-secondary)',
+          background: 'rgba(15, 23, 42, 0.6)'
+        }}
+      >
+        <div style={{ maxWidth: '800px', margin: '0 auto 0.75rem auto', color: '#94a3b8', fontSize: '0.75rem', lineHeight: '1.4' }}>
+          ⚖️ <strong>{t('app.medicalDisclaimer')}</strong>
+        </div>
+        <div>
+          Music Mantra — Swara Healing Web · Client-Side DSP Engine · Confidential & Private
+        </div>
       </footer>
     </div>
   );
