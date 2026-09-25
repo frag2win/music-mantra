@@ -1,6 +1,6 @@
 /* ============================================================
-   Lotus Intro — Cinematic Entry Animation
-   Only plays on the very first site visit per browser session.
+   Lotus Intro — Cinematic Full-Screen Entry Animation  v2
+   Smooth, detailed, covers entire viewport.
    ============================================================ */
 
 .lotus-intro-overlay {
@@ -11,10 +11,10 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* Deep spiritual dark background */
-  background: radial-gradient(ellipse at 50% 80%, #1a0a1f 0%, #0d0618 35%, #050210 100%);
+  background: radial-gradient(ellipse at 50% 65%, #1a0a20 0%, #0d0618 40%, #050210 100%);
   opacity: 1;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lotus-intro-overlay.fade-out {
@@ -22,318 +22,292 @@
   pointer-events: none;
 }
 
+/* ---- Ambient atmospheric mist ---- */
+
+.lotus-mist {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 60% at 30% 80%, rgba(100, 40, 80, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 50% at 70% 75%, rgba(60, 20, 60, 0.10) 0%, transparent 65%);
+  animation: mistDrift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes mistDrift {
+  0%   { transform: translateX(-3%) translateY(0); opacity: 0.6; }
+  100% { transform: translateX(3%) translateY(-2%); opacity: 1; }
+}
+
 /* ---- Falling Petal Particles ---- */
 
 .petal-particle {
   position: absolute;
-  top: -5vh;
-  width: var(--petal-size, 12px);
-  height: var(--petal-size, 12px);
+  top: -8vh;
+  width: var(--petal-size, 14px);
+  height: calc(var(--petal-size, 14px) * 1.5);
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
-  animation: petalFall var(--fall-duration, 5s) var(--fall-delay, 0s) ease-in forwards;
+  animation: petalFall var(--fall-duration, 6s) var(--fall-delay, 0s) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .petal-particle svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 4px rgba(219, 112, 147, 0.4));
+  filter: drop-shadow(0 2px 6px rgba(180, 60, 100, 0.35));
 }
 
 @keyframes petalFall {
   0% {
     opacity: 0;
-    transform: translateY(0) translateX(0) rotate(0deg) scale(0.5);
+    transform: translateY(0) translateX(0) rotate(var(--start-rot, 0deg)) scale(0.4);
   }
-  8% {
-    opacity: 0.85;
+  6% {
+    opacity: 0.8;
+    transform: translateY(3vh) translateX(var(--sway-a, 8px)) rotate(calc(var(--start-rot, 0deg) + 20deg)) scale(0.7);
+  }
+  25% {
+    opacity: 0.75;
+    transform: translateY(25vh) translateX(var(--sway-b, -15px)) rotate(calc(var(--start-rot, 0deg) + 90deg)) scale(0.85);
   }
   50% {
-    opacity: 0.7;
-    transform: translateY(45vh) translateX(var(--sway, 30px)) rotate(180deg) scale(0.9);
+    opacity: 0.6;
+    transform: translateY(50vh) translateX(var(--sway-c, 20px)) rotate(calc(var(--start-rot, 0deg) + 200deg)) scale(0.9);
   }
-  85% {
-    opacity: 0.4;
+  75% {
+    opacity: 0.35;
+    transform: translateY(78vh) translateX(var(--sway-d, -12px)) rotate(calc(var(--start-rot, 0deg) + 300deg)) scale(0.75);
   }
   100% {
     opacity: 0;
-    transform: translateY(105vh) translateX(var(--sway-end, -20px)) rotate(360deg) scale(0.6);
+    transform: translateY(108vh) translateX(var(--sway-e, 5px)) rotate(calc(var(--start-rot, 0deg) + 380deg)) scale(0.5);
   }
 }
 
-/* ---- Central Lotus Container ---- */
+/* ---- Full-screen Lotus SVG ---- */
 
-.lotus-bloom-container {
-  position: relative;
-  width: 320px;
-  height: 320px;
+.lotus-svg-wrapper {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: lotusContainerScale 4s 2.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-  opacity: 0;
-}
-
-@keyframes lotusContainerScale {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  20% {
-    opacity: 1;
-    transform: scale(0.6);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Fullscreen expansion phase: lotus blooms to fill entire viewport */
-.lotus-bloom-container.expand {
-  animation: lotusExpand 1.8s cubic-bezier(0.3, 0, 0.2, 1) forwards;
-}
-
-@keyframes lotusExpand {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(8);
-    opacity: 0;
-  }
-}
-
-/* ---- SVG Lotus: Layered Petals ---- */
-
-.lotus-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 30px rgba(180, 60, 100, 0.5))
-          drop-shadow(0 0 60px rgba(219, 112, 147, 0.25));
-}
-
-/* Each petal layer unfurls with staggered timing */
-.lotus-petal-group {
-  transform-origin: 50% 95%;
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-/* Outermost layer (layer 1) opens first */
-.lotus-petal-group.layer-1 {
-  animation: petalUnfurl 2.2s 2.8s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-}
-.lotus-petal-group.layer-2 {
-  animation: petalUnfurl 2s 3.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-}
-.lotus-petal-group.layer-3 {
-  animation: petalUnfurl 1.8s 3.8s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-}
-/* Inner core */
-.lotus-petal-group.layer-4 {
-  animation: coreReveal 1.5s 4.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-}
-
-@keyframes petalUnfurl {
-  0% {
-    opacity: 0;
-    transform: rotate(0deg) scaleY(0.3);
-  }
-  40% {
-    opacity: 1;
-    transform: rotate(0deg) scaleY(0.6);
-  }
-  100% {
-    opacity: 1;
-    transform: rotate(0deg) scaleY(1);
-  }
-}
-
-@keyframes coreReveal {
-  0% {
-    opacity: 0;
-    transform: scale(0.1);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* ---- Stem ---- */
-
-.lotus-stem {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 3px;
-  height: 0;
-  background: linear-gradient(to top, #2d5a27, #4a8c3f, #3d6e35);
-  border-radius: 2px;
-  transform: translateX(-50%);
-  animation: stemGrow 2s 2.5s cubic-bezier(0.3, 0.8, 0.3, 1) forwards;
-}
-
-@keyframes stemGrow {
-  0% { height: 0; opacity: 0; }
-  30% { opacity: 1; }
-  100% { height: 90px; opacity: 1; }
-}
-
-/* ---- Radiance Glow ---- */
-
-.lotus-radiance {
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(245, 158, 11, 0.15) 0%,
-    rgba(219, 112, 147, 0.08) 30%,
-    transparent 60%
-  );
-  opacity: 0;
-  animation: radianceGlow 3s 4.5s ease-out forwards;
   pointer-events: none;
 }
 
-@keyframes radianceGlow {
+.lotus-main-svg {
+  width: 110vmin;
+  height: 110vmin;
+  max-width: none;
+  opacity: 0;
+  transform: scale(0.15);
+  will-change: transform, opacity;
+  animation: lotusAppear 3.5s 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  filter:
+    drop-shadow(0 0 40px rgba(180, 60, 100, 0.4))
+    drop-shadow(0 0 80px rgba(219, 112, 147, 0.2));
+}
+
+@keyframes lotusAppear {
+  0%   { opacity: 0; transform: scale(0.15); }
+  15%  { opacity: 0.6; transform: scale(0.35); }
+  40%  { opacity: 0.9; transform: scale(0.65); }
+  70%  { opacity: 1;   transform: scale(0.88); }
+  85%  { opacity: 1;   transform: scale(0.96); }
+  100% { opacity: 1;   transform: scale(1); }
+}
+
+/* Final bloom: lotus scales to fill + beyond */
+.lotus-main-svg.bloom-expand {
+  animation: lotusBloomExpand 2.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes lotusBloomExpand {
+  0%   { transform: scale(1);   opacity: 1; }
+  40%  { transform: scale(2.5); opacity: 0.9; }
+  70%  { transform: scale(5);   opacity: 0.5; }
+  100% { transform: scale(9);   opacity: 0; }
+}
+
+/* ---- Individual Petal Animation ----
+   Each petal rotates from closed (pointing up, scaleY compressed)
+   to open (fanned out, full size). The transform-origin sits at
+   the base of each petal so they hinge naturally.               */
+
+.lotus-petal {
+  opacity: 0;
+  will-change: transform, opacity;
+  transform-origin: var(--petal-origin-x, 50%) var(--petal-origin-y, 95%);
+  animation:
+    petalOpen var(--petal-dur, 2.5s) var(--petal-delay, 3s) cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes petalOpen {
   0% {
     opacity: 0;
-    transform: scale(0.5);
+    transform: rotate(var(--petal-closed-rot, 0deg)) scaleY(0.2) scaleX(0.6);
   }
-  50% {
+  15% {
+    opacity: 0.7;
+    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.7)) scaleY(0.4) scaleX(0.75);
+  }
+  40% {
+    opacity: 0.9;
+    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.35)) scaleY(0.65) scaleX(0.88);
+  }
+  65% {
     opacity: 1;
-    transform: scale(1);
+    transform: rotate(calc(var(--petal-closed-rot, 0deg) * 0.1)) scaleY(0.85) scaleX(0.96);
+  }
+  85% {
+    transform: rotate(calc(var(--petal-closed-rot, 0deg) * -0.02)) scaleY(1.02) scaleX(1.01);
   }
   100% {
-    opacity: 0.6;
-    transform: scale(1.2);
+    opacity: 1;
+    transform: rotate(0deg) scaleY(1) scaleX(1);
   }
 }
 
-/* ---- Ambient light rays from behind the lotus ---- */
+/* Core golden center */
+.lotus-core-group {
+  opacity: 0;
+  transform: scale(0);
+  will-change: transform, opacity;
+  animation: coreBloom 2s var(--core-delay, 4.8s) cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
 
-.lotus-rays {
+@keyframes coreBloom {
+  0%   { opacity: 0; transform: scale(0); }
+  40%  { opacity: 1; transform: scale(1.1); }
+  70%  { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Radiance behind lotus ---- */
+
+.lotus-back-radiance {
   position: absolute;
-  width: 300%;
-  height: 300%;
-  top: -100%;
-  left: -100%;
+  width: 100vmin;
+  height: 100vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(245, 158, 11, 0.18) 0%,
+    rgba(219, 112, 147, 0.10) 25%,
+    rgba(139, 34, 82, 0.05) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  will-change: opacity, transform;
+  animation: radiancePulse 4s 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes radiancePulse {
+  0%   { opacity: 0; transform: scale(0.4); }
+  50%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.15); }
+}
+
+/* Slow-rotating light rays */
+.lotus-light-rays {
+  position: absolute;
+  width: 130vmin;
+  height: 130vmin;
   opacity: 0;
   background:
     conic-gradient(from 0deg at 50% 50%,
       transparent 0deg,
-      rgba(245, 158, 11, 0.06) 15deg,
-      transparent 30deg,
-      rgba(219, 112, 147, 0.05) 45deg,
-      transparent 60deg,
-      rgba(245, 158, 11, 0.06) 75deg,
-      transparent 90deg,
-      rgba(219, 112, 147, 0.05) 105deg,
-      transparent 120deg,
-      rgba(245, 158, 11, 0.06) 135deg,
-      transparent 150deg,
-      rgba(219, 112, 147, 0.05) 165deg,
-      transparent 180deg,
-      rgba(245, 158, 11, 0.06) 195deg,
-      transparent 210deg,
-      rgba(219, 112, 147, 0.05) 225deg,
+      rgba(245, 200, 100, 0.04) 8deg,
+      transparent 16deg,
+      rgba(219, 160, 180, 0.035) 24deg,
+      transparent 32deg,
+      rgba(245, 200, 100, 0.04) 40deg,
+      transparent 48deg,
+      rgba(219, 160, 180, 0.035) 56deg,
+      transparent 64deg,
+      rgba(245, 200, 100, 0.04) 72deg,
+      transparent 80deg,
+      rgba(219, 160, 180, 0.035) 88deg,
+      transparent 96deg,
+      rgba(245, 200, 100, 0.04) 104deg,
+      transparent 112deg,
+      rgba(219, 160, 180, 0.035) 120deg,
+      transparent 128deg,
+      rgba(245, 200, 100, 0.04) 136deg,
+      transparent 144deg,
+      rgba(219, 160, 180, 0.035) 152deg,
+      transparent 160deg,
+      rgba(245, 200, 100, 0.04) 168deg,
+      transparent 176deg,
+      rgba(219, 160, 180, 0.035) 184deg,
+      transparent 192deg,
+      rgba(245, 200, 100, 0.04) 200deg,
+      transparent 208deg,
+      rgba(219, 160, 180, 0.035) 216deg,
+      transparent 224deg,
+      rgba(245, 200, 100, 0.04) 232deg,
       transparent 240deg,
-      rgba(245, 158, 11, 0.06) 255deg,
-      transparent 270deg,
-      rgba(219, 112, 147, 0.05) 285deg,
-      transparent 300deg,
-      rgba(245, 158, 11, 0.06) 315deg,
-      transparent 330deg,
-      rgba(219, 112, 147, 0.05) 345deg,
-      transparent 360deg
+      rgba(219, 160, 180, 0.035) 248deg,
+      transparent 256deg,
+      rgba(245, 200, 100, 0.04) 264deg,
+      transparent 272deg,
+      rgba(219, 160, 180, 0.035) 280deg,
+      transparent 288deg,
+      rgba(245, 200, 100, 0.04) 296deg,
+      transparent 304deg,
+      rgba(219, 160, 180, 0.035) 312deg,
+      transparent 320deg,
+      rgba(245, 200, 100, 0.04) 328deg,
+      transparent 336deg,
+      rgba(219, 160, 180, 0.035) 344deg,
+      transparent 352deg,
+      rgba(245, 200, 100, 0.04) 360deg
     );
-  animation: raysAppear 3s 4.8s ease-out forwards, raysSpin 20s 4.8s linear infinite;
+  animation:
+    raysIn 3s 4s ease-out forwards,
+    raysRotate 30s 4s linear infinite;
   pointer-events: none;
 }
 
-@keyframes raysAppear {
-  0% { opacity: 0; }
+@keyframes raysIn {
+  0%   { opacity: 0; }
   100% { opacity: 1; }
 }
 
-@keyframes raysSpin {
+@keyframes raysRotate {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* ---- Water surface reflection ---- */
+/* ---- Floating golden pollen ---- */
 
-.lotus-water {
+.pollen-dot {
   position: absolute;
-  bottom: -30px;
-  left: -40%;
-  width: 180%;
-  height: 60px;
-  background: linear-gradient(to bottom,
-    rgba(30, 58, 95, 0.3) 0%,
-    rgba(30, 58, 95, 0.1) 50%,
-    transparent 100%
-  );
+  width: var(--dot-size, 3px);
+  height: var(--dot-size, 3px);
   border-radius: 50%;
-  opacity: 0;
-  animation: waterAppear 2s 3s ease-out forwards;
-  filter: blur(6px);
-}
-
-@keyframes waterAppear {
-  0% { opacity: 0; transform: scaleX(0.5); }
-  100% { opacity: 1; transform: scaleX(1); }
-}
-
-/* ---- Floating dust / pollen particles around the bloom ---- */
-
-.pollen-particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(245, 200, 80, 0.7);
+  background: radial-gradient(circle, rgba(245, 210, 90, 0.9) 0%, rgba(245, 180, 60, 0.4) 100%);
+  box-shadow: 0 0 6px rgba(245, 200, 80, 0.5);
   opacity: 0;
   pointer-events: none;
-  animation: pollenFloat var(--pollen-dur, 4s) var(--pollen-delay, 4s) ease-in-out infinite;
+  will-change: transform, opacity;
+  animation: pollenDrift var(--dot-dur, 5s) var(--dot-delay, 5s) ease-in-out infinite;
 }
 
-@keyframes pollenFloat {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  20% {
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(var(--pollen-dx, 20px), var(--pollen-dy, -30px));
-    opacity: 0.6;
-  }
-  80% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--pollen-dx2, -10px), var(--pollen-dy2, -50px));
-  }
+@keyframes pollenDrift {
+  0%   { opacity: 0;   transform: translate(0, 0) scale(0.5); }
+  15%  { opacity: 0.9; transform: translate(var(--dx1, 5px), var(--dy1, -8px)) scale(1); }
+  50%  { opacity: 0.6; transform: translate(var(--dx2, 15px), var(--dy2, -25px)) scale(0.8); }
+  85%  { opacity: 0.3; transform: translate(var(--dx3, -5px), var(--dy3, -40px)) scale(0.6); }
+  100% { opacity: 0;   transform: translate(var(--dx4, 0px), var(--dy4, -55px)) scale(0.4); }
 }
 
-/* ---- Responsive adjustments ---- */
+/* ---- Responsive ---- */
 
 @media (max-width: 600px) {
-  .lotus-bloom-container {
-    width: 220px;
-    height: 220px;
+  .lotus-main-svg {
+    width: 140vmin;
+    height: 140vmin;
   }
 }
