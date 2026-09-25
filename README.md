@@ -155,12 +155,49 @@ PostgreSQL schema stores minimal personal data:
 
 ---
 
+## Setup & Development
+
+### Prerequisites
+- Node.js (v18+)
+- npm (v9+)
+
+### Installation
+1. Clone the repository and navigate into the project directory.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+Start the development server:
+```bash
+npm run dev
+```
+
+### Testing
+This project uses Vitest for unit tests and Playwright for End-to-End (E2E) testing. The E2E tests are configured to mock microphone streams, so a physical microphone is not required during automated testing.
+
+- **Run unit tests:**
+  ```bash
+  npx vitest run
+  ```
+- **Run E2E tests:**
+  ```bash
+  npx playwright test
+  ```
+- **Linting:**
+  ```bash
+  npm run lint
+  ```
+
+---
+
 ## Development & Project Milestones
 
-| Milestone | Scope & Deliverables | Target |
+| Milestone | Scope & Deliverables | Status |
 |---|---|---|
-| **M0 — DSP Core** | AudioWorklet YIN implementation, noise calibration, synthetic signal harness | 1–2 Wks |
-| **M1 — App Flow** | XState machine implementation, UI screens, metric scoring, Playwright E2E | 1–2 Wks |
+| **M0 — DSP Core** | AudioWorklet YIN implementation, noise calibration, synthetic signal harness | ✅ Completed |
+| **M1 — App Flow** | XState machine implementation, UI screens, metric scoring, Playwright E2E | ✅ Completed |
 | **M2 — Content & API** | 72 studio reference M4A files, CI pitch QA script, Postgres backend, magic link auth | 2 Wks |
 | **M3 — Beta Testing** | 15–20 user field testing across iOS/Android, key detection corpus refinement | 2 Wks |
 | **M4 — Launch** | Legal compliance review, WCAG 2.1 AA accessibility audit, public release | Final |
