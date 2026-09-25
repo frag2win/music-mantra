@@ -15,12 +15,14 @@ import { Retry } from './components/Retry';
 import { RetryShort } from './components/RetryShort';
 import DspTestHarness from './components/DspTestHarness';
 import { AuthModal } from './components/common/AuthModal';
+import { BetaFeedbackModal } from './components/common/BetaFeedbackModal';
 import { apiClient } from './api/client';
 
 export const App: React.FC = () => {
   const [snapshot, send] = useMachine(appMachine);
   const [showHarness, setShowHarness] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
+  const [showBetaModal, setShowBetaModal] = React.useState(false);
   const [isAuthenticated, setIsAuthenticated] = React.useState(apiClient.isAuthenticated());
 
   const state = snapshot.value;
@@ -55,6 +57,15 @@ export const App: React.FC = () => {
           <div style={{ background: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #334155' }}>
             Day {context.activeDay} of {context.totalProgramDays}
           </div>
+
+          <button
+            className="btn-secondary"
+            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+            onClick={() => setShowBetaModal(true)}
+            title="Inspect device diagnostics and submit beta feedback"
+          >
+            🧪 Feedback
+          </button>
 
           <button
             className="btn-secondary"
@@ -150,6 +161,7 @@ export const App: React.FC = () => {
 
             {state === 'sing' && (
               <Sing
+                saHoldEnabled={context.saHoldEnabled}
                 onSingingComplete={(result) => send({ type: 'SINGING_COMPLETE', result })}
                 onRetrySinging={() => send({ type: 'RETRY_SINGING' })}
               />
@@ -273,6 +285,12 @@ export const App: React.FC = () => {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onAuthChange={() => setIsAuthenticated(apiClient.isAuthenticated())}
+      />
+
+      {/* Beta Feedback & Diagnostics Modal */}
+      <BetaFeedbackModal
+        isOpen={showBetaModal}
+        onClose={() => setShowBetaModal(false)}
       />
 
       {/* Footer */}

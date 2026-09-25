@@ -226,6 +226,48 @@ export const requestHandler = async (req: IncomingMessage, res: ServerResponse) 
       return;
     }
 
+    // ── Phase 3: Beta Testing, Telemetry & Diagnostics ──
+
+    // POST /api/beta/diagnostics
+    if (method === 'POST' && pathname === '/api/beta/diagnostics') {
+      const body = await parseBody(req);
+      const row = await globalStore.recordDiagnostics({
+        timestamp: body.timestamp || new Date().toISOString(),
+        browser: body.browser || 'Unknown',
+        os: body.os || 'Unknown',
+        sample_rate: body.sampleRate,
+        audio_worklet: body.audioWorkletSupported ?? false,
+        wake_lock: body.wakeLockSupported ?? false,
+        user_agent: body.userAgent || 'Unknown',
+      });
+      return json(res, 201, { success: true, diagnosticId: row.id });
+    }
+
+    // POST /api/beta/feedback
+    if (method === 'POST' && pathname === '/api/beta/feedback') {
+      const body = await parseBody(req);
+      if (!body.rating || typeof body.rating !== 'number') {
+        return json(res, 400, { error: 'Rating (1-5) is required.' });
+      }
+
+      const row = await globalStore.recordFeedback({
+        timestamp: new Date().toISOString(),
+        email: body.email,
+        rating: Math.max(1, Math.min(5, Math.round(body.rating))),
+        category: body.category || 'general',
+        comments: body.comments || '',
+        difficulty: body.difficulty || 'moderate',
+      });
+
+      return json(res, 201, { success: true, feedbackId: row.id });
+    }
+
+    // GET /api/beta/metrics
+    if (method === 'GET' && pathname === '/api/beta/metrics') {
+      const metrics = await globalStore.getBetaMetrics();
+      return json(res, 200, metrics);
+    }
+
     // 404 Fallback
     return json(res, 404, { error: `Endpoint ${method} ${pathname} not found` });
   } catch (err) {

@@ -265,3 +265,5 @@ class YinProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor('yin-processor', YinProcessor);
+
+export { YinProcessor };

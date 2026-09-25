@@ -41,11 +41,34 @@ export interface MagicLinkToken {
   used: boolean;
 }
 
+export interface BetaDiagnosticsRow {
+  id: string;
+  timestamp: string;
+  browser: string;
+  os: string;
+  sample_rate?: number;
+  audio_worklet: boolean;
+  wake_lock: boolean;
+  user_agent: string;
+}
+
+export interface BetaFeedbackRow {
+  id: string;
+  timestamp: string;
+  email?: string;
+  rating: number; // 1-5
+  category: 'audio_quality' | 'ease_of_use' | 'accuracy' | 'bug' | 'general';
+  comments: string;
+  difficulty: 'easy' | 'moderate' | 'difficult';
+}
+
 export class MemoryStore {
   public users: Map<string, UserRow> = new Map();
   public programs: Map<string, ProgramRow> = new Map();
   public sessions: Map<string, SessionRow> = new Map();
   public magicLinks: Map<string, MagicLinkToken> = new Map();
+  public betaDiagnostics: Map<string, BetaDiagnosticsRow> = new Map();
+  public betaFeedback: Map<string, BetaFeedbackRow> = new Map();
 
   // ── User operations ──
 
@@ -217,6 +240,69 @@ export class MemoryStore {
     }
     entry.used = true;
     return entry.email;
+  }
+
+  // ── Phase 3: Beta Diagnostics & Feedback ──
+
+  async recordDiagnostics(diag: Omit<BetaDiagnosticsRow, 'id'>): Promise<BetaDiagnosticsRow> {
+    const row: BetaDiagnosticsRow = {
+      id: randomUUID(),
+      ...diag,
+    };
+    this.betaDiagnostics.set(row.id, row);
+    return row;
+  }
+
+  async recordFeedback(feedback: Omit<BetaFeedbackRow, 'id'>): Promise<BetaFeedbackRow> {
+    const row: BetaFeedbackRow = {
+      id: randomUUID(),
+      ...feedback,
+    };
+    this.betaFeedback.set(row.id, row);
+    return row;
+  }
+
+  async getBetaMetrics() {
+    const allSessions = Array.from(this.sessions.values());
+    const totalSessions = allSessions.length;
+    const completedSessions = allSessions.filter((s) => s.completed).length;
+
+    const meanEvalAccuracy =
+      totalSessions > 0
+        ? allSessions.reduce((acc, s) => acc + s.eval_accuracy, 0) / totalSessions
+        : 0;
+
+    const meanSessionAccuracy =
+      totalSessions > 0
+        ? allSessions.reduce((acc, s) => acc + s.mean_accuracy, 0) / totalSessions
+        : 0;
+
+    // Condition breakdown
+    const conditionCounts: Record<string, number> = {};
+    for (const prog of this.programs.values()) {
+      conditionCounts[prog.condition] = (conditionCounts[prog.condition] || 0) + 1;
+    }
+
+    // Feedback rating average
+    const allFeedback = Array.from(this.betaFeedback.values());
+    const avgRating =
+      allFeedback.length > 0
+        ? allFeedback.reduce((acc, f) => acc + f.rating, 0) / allFeedback.length
+        : 0;
+
+    return {
+      totalUsers: this.users.size,
+      totalPrograms: this.programs.size,
+      totalSessions,
+      completedSessions,
+      completionRatePercent: totalSessions > 0 ? (completedSessions / totalSessions) * 100 : 0,
+      meanEvalAccuracy: Math.round(meanEvalAccuracy * 10) / 10,
+      meanSessionAccuracy: Math.round(meanSessionAccuracy * 10) / 10,
+      conditionDistribution: conditionCounts,
+      totalFeedbackEntries: allFeedback.length,
+      averageRating: Math.round(avgRating * 10) / 10,
+      deviceAuditSubmissions: this.betaDiagnostics.size,
+    };
   }
 }
 
