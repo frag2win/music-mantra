@@ -1,6 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
-import { globalStore } from './db/store.ts';
-import { generate45DayIcsCalendar } from '../src/utils/calendar.ts';
+import { globalStore } from './db/store';
+import { generate45DayIcsCalendar } from '../src/utils/calendar';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
