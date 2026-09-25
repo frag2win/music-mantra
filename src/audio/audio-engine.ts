@@ -12,6 +12,7 @@
  */
 
 import { calibrateNoiseFloor, type CalibrationResult } from './calibration';
+import yinProcessorUrl from './worklets/yin-processor.ts?worker&url';
 import type { PitchFrame } from './scale-detector';
 import { generateHarmonicMantraBuffer, type SynthMantraOptions } from './mantra-synth';
 
@@ -143,10 +144,8 @@ export class AudioEngine {
       // Create AudioContext (must be triggered by user gesture on iOS)
       this.audioContext = new AudioContext();
 
-      // Load the YIN worklet
-      await this.audioContext.audioWorklet.addModule(
-        new URL('./worklets/yin-processor.ts', import.meta.url).href
-      );
+      // Load the YIN worklet (using Vite worker URL import to ensure TS compilation)
+      await this.audioContext.audioWorklet.addModule(yinProcessorUrl);
 
       this.sourceNode = this.audioContext.createMediaStreamSource(this.stream);
 
