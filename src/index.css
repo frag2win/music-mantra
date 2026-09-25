@@ -137,19 +137,19 @@ body {
 }
 
 /* ==========================================================================
-   Calm, Spiritually Divine Button, Selector, and Form Systems
-   Designed for Acoustic Sound Therapy and Chakra Healing Sanctuary
+   Lotus Petal Silhouette Design System (Unique Sacred Asymmetrical Geometry)
+   Asymmetrical organic leaf curves with opposing soft & pointed corners
    ========================================================================== */
 
 button {
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
-  border-radius: 9999px;
+  border-radius: 20px 4px 20px 4px;
   border: 1px solid transparent;
   padding: 0.8rem 1.8rem;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -169,7 +169,7 @@ button:disabled {
   filter: grayscale(0.5);
 }
 
-/* Sacred Action Surface (Primary Treatment Gateway) */
+/* Sacred Lotus Petal Action Surface (Primary Treatment Gateway) */
 .btn-primary {
   background:
     radial-gradient(ellipse 110% 80% at 50% -20%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0) 65%),
@@ -177,7 +177,7 @@ button:disabled {
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 9999px;
+  border-radius: 22px 5px 22px 5px;
   padding: 0.85rem 2.2rem;
   box-shadow:
     0 4px 20px -2px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.35)),
@@ -189,6 +189,7 @@ button:disabled {
 }
 
 .btn-primary:hover:not(:disabled) {
+  border-radius: 5px 22px 5px 22px;
   transform: translateY(-2px) scale(1.015);
   box-shadow:
     0 8px 32px -2px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.5)),
@@ -206,14 +207,14 @@ button:disabled {
   filter: brightness(0.97);
 }
 
-/* Contemplative Sacred River Stone (Secondary Pill Button) */
+/* Contemplative Sacred Lotus Leaf (Secondary Tab & Button) */
 .btn-secondary {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%),
     rgba(15, 23, 42, 0.72);
   color: #e2e8f0;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 9999px;
+  border-radius: 18px 4px 18px 4px;
   padding: 0.75rem 1.8rem;
   letter-spacing: 0.03em;
   font-weight: 550;
@@ -225,6 +226,7 @@ button:disabled {
 }
 
 .btn-secondary:hover:not(:disabled) {
+  border-radius: 4px 18px 4px 18px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 100%),
     rgba(30, 41, 59, 0.85);
@@ -248,16 +250,17 @@ button:disabled {
     linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 9999px;
+  border-radius: 18px 4px 18px 4px;
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .btn-danger:hover:not(:disabled) {
+  border-radius: 4px 18px 4px 18px;
   transform: translateY(-2px) scale(1.015);
   box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5), inset 0 1.5px 2px rgba(255, 255, 255, 0.55);
 }
 
-/* Sacred Navigation Amulet */
+/* Lotus Navigation Amulet */
 .btn-back {
   display: inline-flex;
   align-items: center;
@@ -268,18 +271,19 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: #cbd5e1;
   padding: 0.45rem 1.05rem;
-  border-radius: 9999px;
+  border-radius: 16px 3px 16px 3px;
   font-size: 0.85rem;
   font-weight: 550;
   letter-spacing: 0.025em;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
 .btn-back:hover {
+  border-radius: 3px 16px 3px 16px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%),
     rgba(30, 41, 59, 0.85);
@@ -300,7 +304,7 @@ button:disabled {
   transform: translateX(-2px);
 }
 
-/* Floating Sacred Form Controls: Dropdowns & Selects */
+/* Floating Lotus Leaf Form Controls: Dropdowns & Selects */
 select, .custom-select {
   appearance: none;
   -webkit-appearance: none;
@@ -311,20 +315,21 @@ select, .custom-select {
   background-position: right 0.95rem center;
   background-size: 14px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 9999px;
+  border-radius: 18px 4px 18px 4px;
   padding: 0.6rem 2.5rem 0.6rem 1.15rem;
   color: #f8fafc;
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 550;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 select:hover, .custom-select:hover {
+  border-radius: 4px 18px 4px 18px;
   border-color: var(--chakra-theme-accent, rgba(255, 255, 255, 0.4));
   background-color: rgba(30, 41, 59, 0.9);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 14px var(--chakra-theme-accent-soft, rgba(255, 255, 255, 0.12));
@@ -342,7 +347,7 @@ select option {
   padding: 0.6rem;
 }
 
-/* Sacred Swara Singing Stones (Pitch / Note Selection Chips) */
+/* Sacred Swara Singing Stones (Pitch / Note Selection Chips with Lotus Petal Silhouette) */
 .pitch-option-chip {
   position: relative;
   display: flex;
@@ -350,14 +355,14 @@ select option {
   align-items: center;
   justify-content: center;
   padding: 0.8rem 0.5rem;
-  border-radius: 18px;
+  border-radius: 16px 3px 16px 3px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%),
     rgba(15, 23, 42, 0.72);
   color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   user-select: none;
@@ -365,6 +370,7 @@ select option {
 }
 
 .pitch-option-chip:hover {
+  border-radius: 3px 16px 3px 16px;
   border-color: rgba(255, 255, 255, 0.35);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%),
@@ -376,6 +382,7 @@ select option {
 }
 
 .pitch-option-chip.selected {
+  border-radius: 18px 4px 18px 4px;
   background:
     radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 70%),
     linear-gradient(135deg, var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.25)) 0%, rgba(15, 23, 42, 0.9) 100%);
@@ -435,8 +442,8 @@ select option {
   width: 48px;
   height: 26px;
   background-color: rgba(15, 23, 42, 0.85);
-  border-radius: 9999px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 16px 4px 16px 4px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
@@ -445,32 +452,79 @@ select option {
 .toggle-slider:before {
   content: "";
   position: absolute;
-  height: 20px;
-  width: 20px;
-  left: 2px;
-  bottom: 2px;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
   background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-  border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 12px 3px 12px 3px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .toggle-switch input:checked + .toggle-slider {
   background: linear-gradient(135deg, var(--chakra-theme-accent, #f59e0b) 0%, var(--chakra-theme-secondary, #d97706) 100%);
   border-color: rgba(255, 255, 255, 0.4);
+  border-radius: 4px 16px 4px 16px;
   box-shadow: 0 0 18px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.4)), inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(22px);
+  border-radius: 3px 12px 3px 12px;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 12px rgba(255, 255, 255, 0.7);
 }
 
+/* Dedicated Lotus Petal Tab System */
+.lotus-tab-bar {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 0.4rem;
+  border-radius: 20px 4px 20px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+}
 
+.lotus-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 16px 3px 16px 3px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lotus-tab:hover {
+  border-radius: 3px 16px 3px 16px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lotus-tab.active {
+  border-radius: 18px 4px 18px 4px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.28) 0%, transparent 70%),
+    linear-gradient(135deg, var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.25)) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: var(--chakra-theme-accent, #f59e0b);
+  color: #ffffff;
+  box-shadow: 0 0 20px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.3)), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Lotus Sanctuary Cards & Tablets */
 .card {
   background-color: var(--chakra-theme-card-bg, rgba(30, 41, 59, 0.75));
-  border-radius: 22px;
+  border-radius: 28px 6px 28px 6px;
   padding: 1.75rem;
   border: 1px solid var(--chakra-theme-card-border, rgba(255, 255, 255, 0.12));
   box-shadow:
@@ -497,7 +551,7 @@ select option {
 
 .modal-content {
   background-color: var(--chakra-theme-card-bg, rgba(20, 28, 48, 0.95));
-  border-radius: 24px;
+  border-radius: 28px 6px 28px 6px;
   max-width: 550px;
   width: 100%;
   padding: 2rem;

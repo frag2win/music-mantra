@@ -84,8 +84,8 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                       style={{
                         fontSize: '0.8rem',
                         fontWeight: 700,
-                        padding: '0.25rem 0.6rem',
-                        borderRadius: '12px',
+                        padding: '0.3rem 0.75rem',
+                        borderRadius: '14px 3px 14px 3px',
                         background: chakraTheme.accentSoft,
                         color: chakraTheme.accent,
                         border: `1px solid ${chakraTheme.accent}44`,
@@ -98,8 +98,8 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                         style={{
                           fontSize: '0.7rem',
                           fontWeight: 700,
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '9999px',
+                          padding: '0.25rem 0.6rem',
+                          borderRadius: '12px 3px 12px 3px',
                           background: chakraTheme.accent,
                           color: item.id === 'diabetes' ? '#1c1917' : '#ffffff',
                           display: 'inline-flex',
@@ -117,7 +117,7 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                     style={{
                       width: '32px',
                       height: '32px',
-                      borderRadius: '50%',
+                      borderRadius: '12px 3px 12px 3px',
                       background: `radial-gradient(circle, ${chakraTheme.accent} 0%, ${chakraTheme.bgGradient.from} 100%)`,
                       display: 'flex',
                       alignItems: 'center',
@@ -153,8 +153,8 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                     fontSize: '0.8rem',
                     color: '#cbd5e1',
                     background: 'rgba(15, 23, 42, 0.5)',
-                    padding: '0.6rem 0.8rem',
-                    borderRadius: '8px',
+                    padding: '0.65rem 0.9rem',
+                    borderRadius: '16px 4px 16px 4px',
                     marginBottom: '1rem',
                     borderLeft: `3px solid ${chakraTheme.accent}`,
                   }}

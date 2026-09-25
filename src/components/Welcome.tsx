@@ -72,7 +72,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
 
       <div style={{ marginBottom: '2rem' }}>
         {!disclaimerAccepted ? (
-          <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', padding: '1rem', borderRadius: '8px', color: '#fca5a5' }}>
+          <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', padding: '1rem', borderRadius: '16px 4px 16px 4px', color: '#fca5a5' }}>
             <p style={{ marginBottom: '0.75rem', fontWeight: 600 }}>Medical Disclaimer Required</p>
             <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
               You must acknowledge and accept the medical disclaimer before accessing audio recording features.
@@ -82,7 +82,7 @@ export const Welcome: React.FC<WelcomeProps> = ({
             </button>
           </div>
         ) : (
-          <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid var(--success)', padding: '0.75rem', borderRadius: '8px', color: '#86efac', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid var(--success)', padding: '0.75rem 1.25rem', borderRadius: '16px 4px 16px 4px', color: '#86efac', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
             <CheckCircleIcon size={16} />
             <span>Medical Disclaimer Accepted</span>
           </div>
