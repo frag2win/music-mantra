@@ -14,10 +14,14 @@ import { History } from './components/History';
 import { Retry } from './components/Retry';
 import { RetryShort } from './components/RetryShort';
 import DspTestHarness from './components/DspTestHarness';
+import { AuthModal } from './components/common/AuthModal';
+import { apiClient } from './api/client';
 
 export const App: React.FC = () => {
   const [snapshot, send] = useMachine(appMachine);
   const [showHarness, setShowHarness] = React.useState(false);
+  const [showAuthModal, setShowAuthModal] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(apiClient.isAuthenticated());
 
   const state = snapshot.value;
   const context = snapshot.context;
@@ -51,6 +55,14 @@ export const App: React.FC = () => {
           <div style={{ background: '#1e293b', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #334155' }}>
             Day {context.activeDay} of {context.totalProgramDays}
           </div>
+
+          <button
+            className="btn-secondary"
+            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+            onClick={() => setShowAuthModal(true)}
+          >
+            {isAuthenticated ? '👤 Account' : '🔑 Sign In'}
+          </button>
 
           <button
             className="btn-secondary"
@@ -199,7 +211,10 @@ export const App: React.FC = () => {
                 saHz={context.selectedSaHz || 261.63}
                 activeDay={context.activeDay}
                 evalAccuracy={context.evalAccuracy}
-                onHoldPassed={(session) => send({ type: 'HOLD_PASSED', session })}
+                onHoldPassed={(session) => {
+                  apiClient.saveSession(session).catch((err) => console.warn('Could not persist session to backend:', err));
+                  send({ type: 'HOLD_PASSED', session });
+                }}
                 onHoldFailed={() => send({ type: 'HOLD_FAILED' })}
                 onPause={() => send({ type: 'PAUSE' })}
               />
@@ -252,6 +267,13 @@ export const App: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Auth & Profile Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthChange={() => setIsAuthenticated(apiClient.isAuthenticated())}
+      />
 
       {/* Footer */}
       <footer style={{ marginTop: '2rem', padding: '1rem 0', borderTop: '1px solid #334155', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>

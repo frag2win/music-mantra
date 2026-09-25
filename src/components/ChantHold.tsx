@@ -5,6 +5,7 @@ import { AudioEngine } from '../audio/audio-engine';
 import { centError as calcCentError, centToAccuracy } from '../audio/accuracy';
 import type { PitchFrame } from '../audio/scale-detector';
 import { PitchMeter } from './common/PitchMeter';
+import { wakeLockManager } from '../utils/wake-lock';
 
 interface ChantHoldProps {
   condition: HealthCondition;
@@ -44,13 +45,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
 
   useEffect(() => {
     isCompleteRef.current = false;
-    let wakeLock: any = null;
-
-    if ('wakeLock' in navigator) {
-      (navigator as any).wakeLock.request('screen').then((lock: any) => {
-        wakeLock = lock;
-      }).catch(() => {});
-    }
+    wakeLockManager.acquire();
 
     const engine = new AudioEngine({
       onPitchFrame: (frame: PitchFrame) => {
@@ -93,9 +88,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
       isCompleteRef.current = true;
 
       engine.stopListening();
-      if (wakeLock) {
-        wakeLock.release().catch(() => {});
-      }
+      wakeLockManager.release();
 
       const totalVoiced = voicedFramesCountRef.current * 0.0116;
       const minRequiredVoiced = 300; // 50% of 600s = 300s
@@ -141,11 +134,9 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
     return () => {
       isCompleteRef.current = true;
       clearInterval(countdownTimer);
+      wakeLockManager.release();
       if (engineRef.current) {
         engineRef.current.stopListening();
-      }
-      if (wakeLock) {
-        wakeLock.release().catch(() => {});
       }
     };
   }, [condition, saHz, targetHz, activeDay, saNote, evalAccuracy, onHoldPassed, onHoldFailed]);

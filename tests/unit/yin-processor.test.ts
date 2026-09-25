@@ -64,12 +64,14 @@ function generateNoisySineWave(freq: number, durationSec: number, snrDb: number)
   const signalRms = Math.sqrt(0.5); // RMS of sine with amp 1 is 1/sqrt(2)
   const noiseRms = signalRms / Math.pow(10, snrDb / 20);
   
+  let seed = 12345;
   const buffer = new Float32Array(pure.length);
   for (let i = 0; i < pure.length; i++) {
-    // Generate roughly gaussian noise via central limit theorem approximation
+    // Deterministic pseudo-random noise
     let noise = 0;
     for (let j = 0; j < 6; j++) {
-      noise += Math.random() * 2 - 1;
+      seed = (seed * 9301 + 49297) % 233280;
+      noise += (seed / 233280) * 2 - 1;
     }
     noise *= noiseRms / Math.sqrt(2); // scale variance
     buffer[i] = pure[i] + noise;

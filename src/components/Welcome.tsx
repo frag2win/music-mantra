@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiClient } from '../api/client';
 
 interface WelcomeProps {
   activeDay: number;
@@ -90,6 +91,14 @@ export const Welcome: React.FC<WelcomeProps> = ({
           onClick={onStartProgram}
         >
           Begin Today's Practice (Day {activeDay})
+        </button>
+        <button
+          className="btn-secondary"
+          onClick={() => {
+            apiClient.downloadCalendar('Swara Healing 45-Day Program');
+          }}
+        >
+          📅 Download 45-Day Schedule (.ics)
         </button>
         <button className="btn-secondary" onClick={onViewHistory}>
           View Session History

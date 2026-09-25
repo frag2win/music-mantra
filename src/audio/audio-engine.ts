@@ -13,6 +13,7 @@
 
 import { calibrateNoiseFloor, type CalibrationResult } from './calibration';
 import type { PitchFrame } from './scale-detector';
+import { generateHarmonicMantraBuffer, type SynthMantraOptions } from './mantra-synth';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type AudioEngineState =
@@ -34,6 +35,8 @@ export interface AudioEngineEvents {
   onError?: (error: Error) => void;
   /** Fired when mantra playback ends (loop or stopped) */
   onPlaybackStopped?: () => void;
+  /** Fired on platform/device warnings e.g. Bluetooth narrowband */
+  onWarning?: (warning: string) => void;
 }
 
 export interface MicConstraints {
@@ -128,6 +131,13 @@ export class AudioEngine {
           sampleRate: settings.sampleRate,
           channelCount: settings.channelCount,
         });
+
+        // Platform Hardening: Detect narrowband Bluetooth headset (<16 kHz)
+        if (settings.sampleRate && settings.sampleRate < 16000) {
+          this.events.onWarning?.(
+            'Narrowband audio input detected (<16 kHz). Bluetooth headset may reduce pitch accuracy. A wired or built-in microphone is recommended.'
+          );
+        }
       }
 
       // Create AudioContext (must be triggered by user gesture on iOS)
@@ -256,22 +266,43 @@ export class AudioEngine {
   // ── Mantra Playback ─────────────────────────────────────────────────────
 
   /**
-   * Load a mantra audio file into an AudioBuffer for playback.
+   * Ensure AudioContext is resumed (iOS Safari requirement on user gesture)
    */
-  async loadMantra(url: string): Promise<void> {
+  async resumeContext(): Promise<void> {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+  }
+
+  /**
+   * Load a mantra audio file into an AudioBuffer for playback.
+   * If recorded audio file is missing or fails to fetch, gracefully falls back
+   * to generating an authentic harmonic Tanpura + Swara drone buffer.
+   */
+  async loadMantra(url: string, fallbackOptions?: SynthMantraOptions): Promise<void> {
     if (!this.audioContext) {
       this.events.onError?.(new Error('AudioContext not initialized.'));
       return;
     }
 
+    await this.resumeContext();
+
     try {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} loading ${url}`);
+      }
       const arrayBuffer = await response.arrayBuffer();
       this.mantraBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
     } catch (err) {
-      this.events.onError?.(
-        err instanceof Error ? err : new Error(`Failed to load mantra: ${url}`)
-      );
+      if (fallbackOptions) {
+        console.warn(`[AudioEngine] Mantra file ${url} unavailable, generating authentic harmonic drone fallback:`, err);
+        this.mantraBuffer = generateHarmonicMantraBuffer(this.audioContext, fallbackOptions);
+      } else {
+        this.events.onError?.(
+          err instanceof Error ? err : new Error(`Failed to load mantra: ${url}`)
+        );
+      }
     }
   }
 

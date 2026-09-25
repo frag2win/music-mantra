@@ -86,6 +86,51 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
         <span>+100 cents (Sharp)</span>
       </div>
 
+      {/* Real-time Directional Coaching & Motivational Advice */}
+      <div
+        style={{
+          marginTop: '1rem',
+          padding: '0.85rem 1rem',
+          borderRadius: '10px',
+          background:
+            currentAccuracy >= 90
+              ? 'rgba(34, 197, 94, 0.15)'
+              : currentAccuracy >= 70
+                ? 'rgba(234, 179, 8, 0.12)'
+                : 'rgba(239, 68, 68, 0.12)',
+          border: `1px solid ${
+            currentAccuracy >= 90
+              ? 'var(--success)'
+              : currentAccuracy >= 70
+                ? 'var(--warning)'
+                : 'var(--danger)'
+          }`,
+          fontSize: '0.95rem',
+          fontWeight: 600,
+          color:
+            currentAccuracy >= 90
+              ? '#86efac'
+              : currentAccuracy >= 70
+                ? '#fde047'
+                : '#fca5a5',
+          transition: 'all 0.2s ease',
+        }}
+      >
+        {currentHz ? (
+          currentAccuracy >= 90 ? (
+            <span>⭐ Perfect Resonance! Keep holding this exact swara steadily.</span>
+          ) : centError < -20 ? (
+            <span>⬆️ Pitch is flat. Raise your voice slightly higher to hit the note.</span>
+          ) : centError > 20 ? (
+            <span>⬇️ Pitch is sharp. Lower your pitch gently to match the swara.</span>
+          ) : (
+            <span>🎯 Almost there! Stabilize your vocal breath.</span>
+          )
+        ) : (
+          <span>🎙️ Chant the mantra into your microphone to begin feedback...</span>
+        )}
+      </div>
+
       {/* Detailed pitch metadata */}
       {(targetNote || currentNote) && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem', background: '#0f172a', padding: '0.75rem', borderRadius: '8px' }}>

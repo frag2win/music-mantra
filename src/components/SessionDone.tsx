@@ -1,6 +1,7 @@
 import React from 'react';
 import type { SessionRecord } from '../types';
 import { CONDITION_DETAILS } from '../types';
+import { apiClient } from '../api/client';
 
 interface SessionDoneProps {
   session: SessionRecord | null;
@@ -79,9 +80,17 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }} onClick={onGoHome}>
           Return to Dashboard
+        </button>
+        <button
+          className="btn-secondary"
+          onClick={() => {
+            apiClient.downloadCalendar(detail?.name || 'Swara Healing');
+          }}
+        >
+          📅 Download 45-Day Calendar (.ics)
         </button>
         <button className="btn-secondary" onClick={onViewHistory}>
           View History Log

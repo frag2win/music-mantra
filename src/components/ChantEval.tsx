@@ -5,6 +5,7 @@ import { AudioEngine } from '../audio/audio-engine';
 import { centError as calcCentError, centToAccuracy, evaluationGatePassed } from '../audio/accuracy';
 import type { PitchFrame } from '../audio/scale-detector';
 import { PitchMeter } from './common/PitchMeter';
+import { wakeLockManager } from '../utils/wake-lock';
 
 interface ChantEvalProps {
   condition: HealthCondition;
@@ -36,6 +37,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
   useEffect(() => {
     isFinishedRef.current = false;
     pitchFramesRef.current = [];
+    wakeLockManager.acquire();
 
     const engine = new AudioEngine({
       onPitchFrame: (frame: PitchFrame) => {
@@ -94,6 +96,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
 
     return () => {
       isFinishedRef.current = true;
+      wakeLockManager.release();
       if (engineRef.current) {
         engineRef.current.stopListening();
       }

@@ -9,7 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "server": "node server/index.ts",
+    "pitch-qa": "node scripts/pitch-qa.ts"
   },
   "dependencies": {
     "@xstate/react": "^6.1.0",

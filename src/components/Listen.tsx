@@ -24,12 +24,25 @@ export const Listen: React.FC<ListenProps> = ({
   const targetHz = saHz * detail.ratio;
 
   useEffect(() => {
-    const engine = new AudioEngine();
+    const engine = new AudioEngine({
+      onPlaybackStopped: () => setIsPlaying(false),
+    });
     engineRef.current = engine;
+
+    // Platform Hardening: Acquire wake lock during listen state
+    let wakeLock: any = null;
+    if ('wakeLock' in navigator) {
+      (navigator as any).wakeLock.request('screen').then((lock: any) => {
+        wakeLock = lock;
+      }).catch(() => {});
+    }
 
     return () => {
       if (engineRef.current) {
         engineRef.current.stopPlayback();
+      }
+      if (wakeLock) {
+        wakeLock.release().catch(() => {});
       }
     };
   }, []);
@@ -43,6 +56,17 @@ export const Listen: React.FC<ListenProps> = ({
     } else {
       // Half-duplex enforcement
       engineRef.current.stopListening();
+
+      const noteSlug = saNote.replace('#', 'sharp');
+      const audioUrl = `/mantras/${condition}/${noteSlug}-low.m4a`;
+
+      await engineRef.current.loadMantra(audioUrl, {
+        saHz,
+        targetHz,
+        condition,
+      });
+
+      engineRef.current.playMantra();
       setIsPlaying(true);
     }
   };
