@@ -21,6 +21,8 @@ export interface ChakraThemeConfig {
   accent: string;
   accentSoft: string;
   secondaryAccent: string;
+  accentDark?: string;
+  cornerDark?: string;
 
   // Sound-Reactive Pitch Colors (avoids commonly cited red-alert stress cues)
   pitchFeedback: {
@@ -58,6 +60,8 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     accent: '#f59e0b',          // Warm glowing amber
     accentSoft: 'rgba(245, 158, 11, 0.18)',
     secondaryAccent: '#d97706',  // Muted terracotta/honey
+    accentDark: '#6b2d07',       // Deep rich amber shadow
+    cornerDark: '#030201',       // Midnight amber obsidian
 
     pitchFeedback: {
       inTune: '#fbbf24',        // Warm radiant gold
@@ -92,6 +96,8 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     accent: '#10b981',          // Serene sage emerald
     accentSoft: 'rgba(16, 185, 129, 0.18)',
     secondaryAccent: '#f43f5e',  // Soft dusty rose
+    accentDark: '#043e2e',       // Deep forest emerald shadow
+    cornerDark: '#010403',       // Midnight forest obsidian
 
     pitchFeedback: {
       inTune: '#34d399',        // Soothing bright sage
@@ -126,6 +132,8 @@ export const CHAKRA_THEMES: Record<HealthCondition, ChakraThemeConfig> = {
     accent: '#14b8a6',          // Luminous calm teal
     accentSoft: 'rgba(20, 184, 166, 0.18)',
     secondaryAccent: '#38bdf8',  // Sky resonance blue
+    accentDark: '#0e3d3b',       // Deep ocean teal shadow
+    cornerDark: '#010306',       // Midnight abyssal teal obsidian
 
     pitchFeedback: {
       inTune: '#2dd4bf',        // Radiant serene turquoise
@@ -158,6 +166,8 @@ export const DEFAULT_NEUTRAL_THEME: ChakraThemeConfig = {
   accent: '#6366f1',
   accentSoft: 'rgba(99, 102, 241, 0.18)',
   secondaryAccent: '#818cf8',
+  accentDark: '#28236b',
+  cornerDark: '#020308',
   pitchFeedback: {
     inTune: '#818cf8',
     nearTune: '#6366f1',

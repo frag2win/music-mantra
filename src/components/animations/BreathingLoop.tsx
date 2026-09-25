@@ -3,9 +3,11 @@ import { useTheme } from '../../theme/ThemeContext';
 import { LeafIcon } from '../common/Icons';
 
 /**
- * Anahata (Heart Chakra) — Minimalist, Smooth 12-Petaled Lotus
- * Clean, serene, unhurried rotation with sacred Shatkona (hexagram).
- * 4-1-6 therapeutic breathing cadence on the soft ambient glow.
+ * Anahata (Heart Chakra / Neutral Swara) — Mathematically Symmetric 12-Petaled Lotus
+ * Pure sacred geometry:
+ * - 100% equilateral, concentric Shatkona (hexagram) with identical circumradii and center (50, 50)
+ * - Identical master petal replicated across 12 exact 30-degree rotational increments
+ * - Rich color gradients (accent to accentDark) and mystical deep corner vignette
  */
 export interface BreathingLoopProps {
   size?: number;
@@ -21,44 +23,12 @@ export const BreathingLoop: React.FC<BreathingLoopProps> = ({
   const { theme } = useTheme();
   const isFullscreen = variant === 'fullscreen';
 
-  // Smooth, organic 12-petal lotus path calculation
-  const petals = React.useMemo(() => {
-    const paths: string[] = [];
-    const numPetals = 12;
-    const step = 360 / numPetals;
-    const tipR = 47;
-    const baseR = 18;
-    const w = 6.2;
+  const accentDark = theme.accentDark || '#181242';
+  const cornerDark = theme.cornerDark || '#010204';
 
-    for (let i = 0; i < numPetals; i++) {
-      const a = (i * step * Math.PI) / 180;
-      const perp = a + Math.PI / 2;
-
-      const tx = 50 + tipR * Math.sin(a);
-      const ty = 50 - tipR * Math.cos(a);
-
-      const b1x = 50 + baseR * Math.sin(a) + w * 0.3 * Math.sin(perp);
-      const b1y = 50 - baseR * Math.cos(a) - w * 0.3 * Math.cos(perp);
-      const b2x = 50 + baseR * Math.sin(a) - w * 0.3 * Math.sin(perp);
-      const b2y = 50 - baseR * Math.cos(a) + w * 0.3 * Math.cos(perp);
-
-      // Smooth curvature control points
-      const cp1x = 50 + (baseR + 8) * Math.sin(a) + w * Math.sin(perp);
-      const cp1y = 50 - (baseR + 8) * Math.cos(a) - w * Math.cos(perp);
-      const cp2x = 50 + (tipR - 6) * Math.sin(a) + w * 0.5 * Math.sin(perp);
-      const cp2y = 50 - (tipR - 6) * Math.cos(a) - w * 0.5 * Math.cos(perp);
-
-      const cp3x = 50 + (tipR - 6) * Math.sin(a) - w * 0.5 * Math.sin(perp);
-      const cp3y = 50 - (tipR - 6) * Math.cos(a) + w * 0.5 * Math.cos(perp);
-      const cp4x = 50 + (baseR + 8) * Math.sin(a) - w * Math.sin(perp);
-      const cp4y = 50 - (baseR + 8) * Math.cos(a) + w * Math.cos(perp);
-
-      paths.push(
-        `M ${b1x.toFixed(2)} ${b1y.toFixed(2)} C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${tx.toFixed(2)} ${ty.toFixed(2)} C ${cp3x.toFixed(2)} ${cp3y.toFixed(2)}, ${cp4x.toFixed(2)} ${cp4y.toFixed(2)}, ${b2x.toFixed(2)} ${b2y.toFixed(2)} Z`
-      );
-    }
-    return paths;
-  }, []);
+  // Master petal path centered on vertical midline x=50, perfectly symmetric:
+  // Base at (50, 32), smooth bilateral curve out to (56.5, 30) and (55.2, 13.5), tapering to tip at (50, 3.5)
+  const masterPetalD = 'M 50 32 C 56.5 30, 55.2 13.5, 50 3.5 C 44.8 13.5, 43.5 30, 50 32 Z';
 
   return (
     <div
@@ -72,7 +42,7 @@ export const BreathingLoop: React.FC<BreathingLoopProps> = ({
               zIndex: -1,
               pointerEvents: 'none',
               overflow: 'hidden',
-              background: `radial-gradient(ellipse at center, ${theme.bgGradient.from} 0%, ${theme.bgGradient.via} 50%, ${theme.bgGradient.to} 100%)`,
+              background: `radial-gradient(ellipse at 50% 50%, ${theme.bgGradient.from} 0%, ${theme.bgGradient.via} 38%, ${theme.bgGradient.to} 70%, ${cornerDark} 100%)`,
             }
           : {
               position: 'relative',
@@ -86,6 +56,9 @@ export const BreathingLoop: React.FC<BreathingLoopProps> = ({
       }
       aria-label="Anahata Breath Guide"
     >
+      {/* Corner darkening vignette for deep mystical ambiance */}
+      {isFullscreen && <div className="chakra-corner-vignette" aria-hidden="true" />}
+
       {/* Gentle ambient breathing glow (4s Inhale, 1s Hold, 6s Exhale) */}
       {isFullscreen && (
         <div
@@ -94,69 +67,119 @@ export const BreathingLoop: React.FC<BreathingLoopProps> = ({
             inset: 0,
             width: '100%',
             height: '100%',
-            background: `radial-gradient(circle at 50% 50%, ${theme.accent}35 0%, ${theme.accentSoft} 30%, transparent 68%)`,
+            background: `radial-gradient(circle at 50% 50%, ${theme.accent}30 0%, ${theme.accentSoft} 28%, transparent 65%)`,
             animation: 'anahataBreathCycle 11s cubic-bezier(0.4, 0, 0.2, 1) infinite',
             willChange: 'opacity, transform',
+            zIndex: 0,
           }}
         />
       )}
 
-      {/* Clean, smoothly rotating 12-petal chakra — guaranteed continuous rotation via global CSS */}
+      {/* Clean, smoothly rotating 12-petal chakra — guaranteed continuous slow rotation via global CSS */}
       <div
         className={isFullscreen ? 'chakra-spin-fullscreen' : 'chakra-spin-inline'}
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          zIndex: 1,
         }}
       >
         <svg
           width="100%"
           height="100%"
           viewBox="0 0 100 100"
-          style={{ opacity: isFullscreen ? 0.38 : 0.65 }}
+          style={{ opacity: isFullscreen ? 0.42 : 0.72 }}
           aria-hidden="true"
         >
-          {/* Outer Thin Halo Ring */}
-          <circle cx="50" cy="50" r="48" fill="none" stroke={theme.accent} strokeWidth="0.4" opacity="0.45" />
+          <defs>
+            {/* Petal Fill Gradient: accent to deep accentDark shade */}
+            <linearGradient id="anahataPetalFill" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor={accentDark} stopOpacity="0.45" />
+              <stop offset="50%" stopColor={theme.accent} stopOpacity="0.22" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.55" />
+            </linearGradient>
 
-          {/* 12 Smooth Lotus Petals */}
-          {petals.map((d, i) => (
-            <path
-              key={`petal-${i}`}
-              d={d}
-              fill={`${theme.accent}16`}
-              stroke={theme.accent}
-              strokeWidth={isFullscreen ? '0.55' : '0.9'}
-              strokeLinejoin="round"
-            />
+            {/* Petal Stroke Gradient: glowing accent to darker edge */}
+            <linearGradient id="anahataPetalStroke" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor={theme.accent} stopOpacity="0.9" />
+              <stop offset="55%" stopColor={theme.accent} stopOpacity="0.7" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.5" />
+            </linearGradient>
+
+            {/* Upward Triangle Gradient (Shiva / Consciousness) */}
+            <radialGradient id="shatkonaUpFill" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={theme.accent} stopOpacity="0.26" />
+              <stop offset="85%" stopColor={accentDark} stopOpacity="0.12" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.04" />
+            </radialGradient>
+
+            {/* Downward Triangle Gradient (Shakti / Manifestation) */}
+            <radialGradient id="shatkonaDownFill" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={theme.secondaryAccent} stopOpacity="0.24" />
+              <stop offset="85%" stopColor={accentDark} stopOpacity="0.12" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.04" />
+            </radialGradient>
+
+            {/* Outer Halo Fade Gradient */}
+            <radialGradient id="haloStrokeGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="85%" stopColor={theme.accent} stopOpacity="0.5" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.2" />
+            </radialGradient>
+
+            {/* Central Bindu Core Gradient */}
+            <radialGradient id="binduGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+              <stop offset="45%" stopColor={theme.accent} stopOpacity="0.9" />
+              <stop offset="100%" stopColor={accentDark} stopOpacity="0.8" />
+            </radialGradient>
+          </defs>
+
+          {/* Outer Halo Rings */}
+          <circle cx="50" cy="50" r="48" fill="none" stroke="url(#haloStrokeGrad)" strokeWidth="0.4" />
+          <circle cx="50" cy="50" r="46.5" fill="none" stroke={theme.accent} strokeWidth="0.2" opacity="0.3" strokeDasharray="1 2" />
+
+          {/* 12 Mathematically Identical Lotus Petals rotated with 30-degree symmetry */}
+          {Array.from({ length: 12 }).map((_, i) => (
+            <g key={`petal-${i}`} transform={`rotate(${i * 30}, 50, 50)`}>
+              <path
+                d={masterPetalD}
+                fill="url(#anahataPetalFill)"
+                stroke="url(#anahataPetalStroke)"
+                strokeWidth={isFullscreen ? '0.55' : '0.9'}
+                strokeLinejoin="round"
+              />
+            </g>
           ))}
 
-          {/* Inner Lotus Ring */}
+          {/* Inner Lotus Rings */}
           <circle cx="50" cy="50" r="18" fill="none" stroke={theme.accent} strokeWidth="0.6" opacity="0.8" />
           <circle cx="50" cy="50" r="15" fill="none" stroke={theme.secondaryAccent} strokeWidth="0.35" opacity="0.5" />
 
-          {/* Clean Central Sacred Shatkona: Two Interlocking Triangles */}
-          {/* Upward Triangle (Shiva / Consciousness) */}
+          {/* Mathematically Exact Shatkona: Two Equilateral Concentric Triangles (R = 21, center = 50, 50) */}
+          {/* Upward Triangle: top at (50, 29), base corners at (68.187, 60.5) and (31.813, 60.5) */}
           <polygon
-            points="50,30 67,59 33,59"
-            fill={`${theme.accent}16`}
+            points="50,29 68.187,60.5 31.813,60.5"
+            fill="url(#shatkonaUpFill)"
             stroke={theme.accent}
             strokeWidth={isFullscreen ? '0.55' : '1.0'}
             strokeLinejoin="round"
           />
-          {/* Downward Triangle (Shakti / Manifestation) */}
+          {/* Downward Triangle: bottom at (50, 71), top corners at (68.187, 39.5) and (31.813, 39.5) */}
           <polygon
-            points="50,66 67,37 33,37"
-            fill={`${theme.secondaryAccent}14`}
+            points="50,71 68.187,39.5 31.813,39.5"
+            fill="url(#shatkonaDownFill)"
             stroke={theme.secondaryAccent}
             strokeWidth={isFullscreen ? '0.55' : '1.0'}
             strokeLinejoin="round"
           />
 
+          {/* Concentric Center Hexagon Accent Ring */}
+          <circle cx="50" cy="50" r="7.5" fill="none" stroke={theme.accent} strokeWidth="0.3" opacity="0.4" />
+
           {/* Central Bindu Core */}
-          <circle cx="50" cy="50" r="3.2" fill={theme.accent} opacity="0.9" />
-          <circle cx="50" cy="50" r="1.2" fill="#ffffff" opacity="0.95" />
+          <circle cx="50" cy="50" r="3.2" fill="url(#binduGrad)" />
+          <circle cx="50" cy="50" r="1.1" fill="#ffffff" opacity="0.95" />
         </svg>
       </div>
 

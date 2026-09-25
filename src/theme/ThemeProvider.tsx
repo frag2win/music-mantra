@@ -46,6 +46,8 @@ export const ThemeProvider: React.FC<{
 
     root.style.setProperty('--chakra-theme-accent', theme.accent);
     root.style.setProperty('--chakra-theme-accent-soft', theme.accentSoft);
+    root.style.setProperty('--chakra-theme-accent-dark', theme.accentDark || '#28236b');
+    root.style.setProperty('--chakra-theme-corner-dark', theme.cornerDark || '#020308');
     root.style.setProperty('--chakra-theme-secondary', theme.secondaryAccent);
     root.style.setProperty('--chakra-theme-bg-from', theme.bgGradient.from);
     root.style.setProperty('--chakra-theme-bg-via', theme.bgGradient.via);
