@@ -113,4 +113,54 @@ describe('Phase 2: Database Store & DPDP Compliance', () => {
     expect(store.programs.has(program.id)).toBe(false);
     expect(store.sessions.has(session.id)).toBe(false);
   });
+
+  it('cross-checks vocal metadata via POST /api/voice/cross-check', async () => {
+    const { requestHandler } = await import('../../server/index');
+    const { EventEmitter } = await import('node:events');
+
+    const req = new EventEmitter() as any;
+    req.method = 'POST';
+    req.url = '/api/voice/cross-check';
+    req.headers = { host: 'localhost:3001' };
+
+    const res = {
+      statusCode: 200,
+      headers: {} as any,
+      body: '',
+      writeHead(status: number, headers: any) {
+        this.statusCode = status;
+        this.headers = headers;
+      },
+      end(chunk?: string) {
+        if (chunk) this.body += chunk;
+      },
+    };
+
+    const promise = requestHandler(req, res as any);
+
+    req.emit(
+      'data',
+      Buffer.from(
+        JSON.stringify({
+          condition: 'diabetes',
+          saNote: 'C',
+          saHz: 261.63,
+          measuredHz: 327.04,
+          voicedDurationSeconds: 7.5,
+        })
+      )
+    );
+    req.emit('end');
+
+    await promise;
+
+    expect(res.statusCode).toBe(200);
+    const data = JSON.parse(res.body);
+    expect(data.success).toBe(true);
+    expect(data.referenceSample.swar).toBe('Ga');
+    expect(data.referenceSample.ratio).toBe(1.25);
+    expect(data.therapistGuidance.resonanceState).toBe('Harmonic Lock');
+    expect(data.matchScore).toBeGreaterThanOrEqual(95);
+  });
 });
+

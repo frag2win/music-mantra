@@ -67,3 +67,44 @@ export interface UserProgram {
   totalDays: number;
   active: boolean;
 }
+
+export interface TherapistGuidance {
+  headline: string;
+  resonanceState: 'Harmonic Lock' | 'Harmonic Approach' | 'Slightly Flat' | 'Slightly Sharp' | 'Centering Breath';
+  encouragement: string;
+  techniqueTip: string;
+  breathSupportAssessment: 'Deep & Consistent' | 'Steady' | 'Trailing near end of phrase' | 'Shallow Breath';
+  vibratoQuality: 'Warm & Natural' | 'Focused Core Tone' | 'Gentle Flutter';
+  octaveRegister: 'Madhya Saptak (Natural Mid)' | 'Mandra Saptak (Deep Grounded Low)' | 'Taar Saptak (Bright High)';
+}
+
+export interface VoiceCrossCheckResult {
+  success: boolean;
+  matchScore: number;
+  rawCentDeviation: number;
+  smoothedCentDeviation: number;
+  targetHz: number;
+  measuredHz: number;
+  saHz: number;
+  saNote: string;
+  referenceSample: {
+    condition: HealthCondition;
+    chakra: string;
+    swar: string;
+    mantra: string;
+    ratio: number;
+    centsOffset: number;
+    saNote: string;
+    targetHz: number;
+    sampleFile: string;
+    hasAudioFile: boolean;
+  };
+  therapistGuidance: TherapistGuidance;
+  vocalMetrics: {
+    voicedDurationSec: number;
+    pitchStabilityPercent: number;
+    vibratoExtentCents: number;
+    onsetGraceApplied: boolean;
+  };
+}
+

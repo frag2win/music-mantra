@@ -1,4 +1,4 @@
-import type { HealthCondition, SessionRecord } from '../types';
+import type { HealthCondition, SessionRecord, VoiceCrossCheckResult } from '../types';
 
 const API_BASE = '/api';
 
@@ -139,6 +139,21 @@ export class ApiClient {
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
+  }
+
+  async crossCheckVoice(payload: {
+    condition: HealthCondition;
+    saNote: string;
+    saHz: number;
+    measuredHz?: number;
+    averageCentsError?: number;
+    voicedDurationSeconds?: number;
+    frames?: Array<{ t: number; f0: number; conf: number; rms?: number }>;
+  }): Promise<VoiceCrossCheckResult> {
+    return this.request('/voice/cross-check', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 }
 

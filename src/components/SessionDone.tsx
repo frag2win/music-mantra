@@ -1,5 +1,5 @@
-import React from 'react';
-import type { SessionRecord } from '../types';
+import React, { useEffect, useState } from 'react';
+import type { SessionRecord, VoiceCrossCheckResult } from '../types';
 import { CONDITION_DETAILS } from '../types';
 import { apiClient } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
@@ -22,6 +22,22 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
 }) => {
   const { t } = useI18n();
   const detail = session ? CONDITION_DETAILS[session.condition] : null;
+  const [therapistResult, setTherapistResult] = useState<VoiceCrossCheckResult | null>(null);
+
+  useEffect(() => {
+    if (session) {
+      apiClient
+        .crossCheckVoice({
+          condition: session.condition,
+          saNote: session.saNote,
+          saHz: session.saHz,
+          averageCentsError: Math.max(-10, Math.min(10, (100 - session.meanAccuracy) * 0.4)),
+          voicedDurationSeconds: session.voicedSeconds,
+        })
+        .then((res) => setTherapistResult(res))
+        .catch(() => {});
+    }
+  }, [session]);
 
   return (
     <div className="session-done-screen card" style={{ padding: '2rem', textAlign: 'center' }}>
@@ -48,6 +64,54 @@ export const SessionDone: React.FC<SessionDoneProps> = ({
           "Session is over. Stop the device and next day again repeat this. Continue this chanting for next 45 days."
         </p>
       </div>
+
+      {/* Musician-Therapist Assessment Card */}
+      {therapistResult && (
+        <div
+          style={{
+            background: 'rgba(30, 41, 59, 0.75)',
+            border: '1px solid var(--accent-primary)',
+            borderRadius: '12px',
+            padding: '1.25rem',
+            maxWidth: '500px',
+            margin: '0 auto 1.5rem auto',
+            textAlign: 'left',
+            boxShadow: '0 8px 24px -4px rgba(0,0,0,0.4)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '0.8rem',
+              color: 'var(--accent-primary)',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.75px',
+              marginBottom: '0.35rem',
+            }}
+          >
+            Therapist Vocal Analysis · {therapistResult.referenceSample.chakra} Swara {therapistResult.referenceSample.swar}
+          </div>
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f8fafc', marginBottom: '0.35rem' }}>
+            {therapistResult.therapistGuidance.headline}
+          </div>
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+            {therapistResult.therapistGuidance.encouragement}
+          </p>
+          <div
+            style={{
+              background: 'rgba(15, 23, 42, 0.7)',
+              padding: '0.75rem 0.85rem',
+              borderRadius: '8px',
+              fontSize: '0.88rem',
+              color: '#e2e8f0',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <strong style={{ color: 'var(--accent-primary)' }}>Coaching Focus: </strong>
+            {therapistResult.therapistGuidance.techniqueTip}
+          </div>
+        </div>
+      )}
 
       {/* Stats Summary Card */}
       {session && (

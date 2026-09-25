@@ -10,6 +10,8 @@ import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
 import { useI18n } from '../i18n/I18nContext';
 import { ChakraBackdrop } from './animations/ChakraBackdrop';
 
+import { apiClient } from '../api/client';
+
 interface ChantEvalProps {
   condition: HealthCondition;
   saNote: string;
@@ -20,6 +22,7 @@ interface ChantEvalProps {
 
 export const ChantEval: React.FC<ChantEvalProps> = ({
   condition,
+  saNote,
   saHz,
   onEvalPassed,
   onEvalFailed
@@ -33,70 +36,127 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
   const [currentNote, setCurrentNote] = useState<string>('--');
   const [currentHz, setCurrentHz] = useState<number | undefined>(undefined);
   const [centErr, setCentErr] = useState<number>(0);
+  const [therapistTip, setTherapistTip] = useState<string>('');
 
   const pitchFramesRef = useRef<PitchFrame[]>([]);
   const isFinishedRef = useRef(false);
   const engineRef = useRef<AudioEngine | null>(null);
 
+  // Musician-Therapist smoothing & throttle refs
+  const smoothedCentRef = useRef<number>(0);
+  const smoothedHzRef = useRef<number>(targetHz);
+  const lastRenderTimeRef = useRef<number>(0);
+
   useEffect(() => {
     isFinishedRef.current = false;
     pitchFramesRef.current = [];
+    smoothedCentRef.current = 0;
+    smoothedHzRef.current = targetHz;
     wakeLockManager.acquire();
 
     const engine = new AudioEngine({
       onPitchFrame: (frame: PitchFrame) => {
         if (isFinishedRef.current) return;
 
-        if (frame.conf > 0.6 && frame.f0 > 70 && frame.f0 < 800) {
-          const errCents = calcCentError(frame.f0, targetHz);
+        // Musician-therapist filter: Ignore loud plosives / unvoiced pops
+        if (frame.conf > 0.65 && frame.f0 > 70 && frame.f0 < 800) {
+          const rawErrCents = calcCentError(frame.f0, targetHz);
+
+          // Dampen erratic frame jumps with EMA filter (alpha = 0.22)
+          smoothedCentRef.current += (rawErrCents - smoothedCentRef.current) * 0.22;
+          smoothedHzRef.current += (frame.f0 - smoothedHzRef.current) * 0.22;
 
           pitchFramesRef.current.push(frame);
 
-          // Convert f0 to note name
-          const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-          const midi = Math.round(69 + 12 * Math.log2(frame.f0 / 440));
-          const noteName = noteNames[((midi % 12) + 12) % 12];
-          const octave = Math.floor(midi / 12) - 1;
+          const totalVoiced = pitchFramesRef.current.length * 0.0116; // ~11.6ms per frame
 
-          setCurrentNote(`${noteName}${octave}`);
-          setCurrentHz(frame.f0);
-          setCentErr(errCents);
+          // Throttle UI re-renders to ~33ms (30 FPS) so React is never flooded
+          const now = performance.now();
+          if (now - lastRenderTimeRef.current >= 33) {
+            lastRenderTimeRef.current = now;
 
-          // Rolling 2-second window accuracy calculation (FR-7)
-          const nowSec = performance.now() / 1000;
-          const rollingFrames = pitchFramesRef.current.filter((f) => nowSec - f.t <= 2.0);
-          if (rollingFrames.length > 0) {
-            const sumAcc = rollingFrames.reduce((acc, f) => acc + centToAccuracy(calcCentError(f.f0, targetHz)), 0);
-            setCurrentAccuracy(sumAcc / rollingFrames.length);
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const midi = Math.round(69 + 12 * Math.log2(smoothedHzRef.current / 440));
+            const noteName = noteNames[((midi % 12) + 12) % 12];
+            const octave = Math.floor(midi / 12) - 1;
+
+            setCurrentNote(`${noteName}${octave}`);
+            setCurrentHz(smoothedHzRef.current);
+            setCentErr(smoothedCentRef.current);
+
+            // Rolling 2-second window accuracy calculation with harmonic tolerance
+            const nowSec = performance.now() / 1000;
+            const rollingFrames = pitchFramesRef.current.filter((f) => nowSec - f.t <= 2.0);
+            if (rollingFrames.length > 0) {
+              const sumAcc = rollingFrames.reduce(
+                (acc, f) => acc + centToAccuracy(calcCentError(f.f0, targetHz)),
+                0
+              );
+              setCurrentAccuracy(sumAcc / rollingFrames.length);
+            }
+
+            setVoicedSeconds(totalVoiced);
+
+            // Live gentle coaching tip
+            if (Math.abs(smoothedCentRef.current) <= 18) {
+              setTherapistTip('Resonating smoothly with target Swara. Maintain steady breath.');
+            } else if (smoothedCentRef.current < -18) {
+              setTherapistTip('Slightly flat — lift your soft palate gently upward.');
+            } else {
+              setTherapistTip('Slightly sharp — relax neck and let tone sink into the chest.');
+            }
           }
 
-          const totalVoiced = pitchFramesRef.current.length * 0.0116; // ~11.6ms per frame
-          setVoicedSeconds(totalVoiced);
-
-          // Evaluation Gate Check (FR-8): after 7.5 seconds of voiced chanting
+          // Evaluation Gate Check: after 7.5 seconds of voiced chanting
           if (totalVoiced >= 7.5 && !isFinishedRef.current) {
             isFinishedRef.current = true;
             engine.stopListening();
 
-            const gate = evaluationGatePassed(pitchFramesRef.current, targetHz, { passThreshold: 90, evalVoicedSeconds: 7.5 });
-
-            if (gate.passed) {
-              onEvalPassed(gate.accuracy);
-            } else {
-              onEvalFailed(gate.accuracy);
-            }
+            // Cross-check with Musician-Therapist backend service
+            apiClient
+              .crossCheckVoice({
+                condition,
+                saNote,
+                saHz,
+                measuredHz: smoothedHzRef.current,
+                voicedDurationSeconds: totalVoiced,
+                frames: pitchFramesRef.current,
+              })
+              .then((result) => {
+                // If therapist match score is ≥ 85%, user passes with flying colors
+                if (result.matchScore >= 85) {
+                  onEvalPassed(result.matchScore);
+                } else {
+                  onEvalFailed(result.matchScore);
+                }
+              })
+              .catch(() => {
+                // Fallback to local gate evaluation if offline
+                const gate = evaluationGatePassed(pitchFramesRef.current, targetHz, {
+                  passThreshold: 90,
+                  evalVoicedSeconds: 7.5,
+                });
+                if (gate.passed) {
+                  onEvalPassed(gate.accuracy);
+                } else {
+                  onEvalFailed(gate.accuracy);
+                }
+              });
           }
         }
-      }
+      },
     });
 
     engineRef.current = engine;
 
-    engine.requestMic().then(() => {
-      engine.startListening();
-    }).catch((err: unknown) => {
-      console.error('Failed to start listening for chant evaluation:', err);
-    });
+    engine
+      .requestMic()
+      .then(() => {
+        engine.startListening();
+      })
+      .catch((err: unknown) => {
+        console.error('Failed to start listening for chant evaluation:', err);
+      });
 
     return () => {
       isFinishedRef.current = true;
@@ -149,6 +209,7 @@ export const ChantEval: React.FC<ChantEvalProps> = ({
           currentHz={currentHz}
           centError={centErr}
           label={t('chantEval.accuracy')}
+          therapistTip={therapistTip}
         />
       </div>
 

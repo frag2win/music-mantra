@@ -10,6 +10,7 @@ interface PitchMeterProps {
   currentHz?: number;
   centError?: number; // -600..600
   label?: string;
+  therapistTip?: string;
 }
 
 export const PitchMeter: React.FC<PitchMeterProps> = ({
@@ -19,12 +20,64 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
   currentNote,
   currentHz,
   centError = 0,
-  label = 'Chanting Pitch Accuracy'
+  label = 'Chanting Pitch Accuracy',
+  therapistTip
 }) => {
   const themeContext = useOptionalTheme();
   const theme = themeContext?.theme;
   const ariaLiveRef = useRef<HTMLDivElement>(null);
   const lastAnnouncedTime = useRef<number>(0);
+
+  // Musician-Therapist Fluid Needle Damper
+  // Dampens sudden volume spikes and pitch pops into a silky, calm 60fps movement
+  const [smoothGaugePos, setSmoothGaugePos] = React.useState<number>(50);
+  const targetPosRef = useRef<number>(50);
+  const currentPosRef = useRef<number>(50);
+  const animFrameRef = useRef<number | null>(null);
+
+  // Update target position based on vocal input
+  useEffect(() => {
+    if (!currentHz || currentAccuracy === 0) {
+      // Resting / unvoiced: gently drift needle home to center
+      targetPosRef.current = 50;
+    } else {
+      const clampedCents = Math.max(-100, Math.min(100, centError));
+      // Convert -100..+100 cents to 0..100% position on gauge
+      targetPosRef.current = ((clampedCents + 100) / 200) * 100;
+    }
+  }, [centError, currentHz, currentAccuracy]);
+
+  // Continuous animation frame lerp for liquid-smooth motion
+  useEffect(() => {
+    let isRunning = true;
+    const updateMotion = () => {
+      if (!isRunning) return;
+
+      const current = currentPosRef.current;
+      const target = targetPosRef.current;
+      const delta = target - current;
+
+      if (Math.abs(delta) < 0.08) {
+        currentPosRef.current = target;
+      } else {
+        // Musician-Therapist Damping:
+        // ~14% step per frame = silky glide, immune to momentary loudness pops
+        currentPosRef.current = current + delta * 0.14;
+      }
+
+      setSmoothGaugePos(currentPosRef.current);
+      animFrameRef.current = requestAnimationFrame(updateMotion);
+    };
+
+    animFrameRef.current = requestAnimationFrame(updateMotion);
+
+    return () => {
+      isRunning = false;
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+      }
+    };
+  }, []);
 
   // Rate-limit aria-live announcements (max 1 announce per 2 seconds to prevent screen reader clutter)
   useEffect(() => {
@@ -46,11 +99,6 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
       : currentAccuracy >= 70
         ? nearTuneColor
         : offPitchColor;
-
-  // Map cent error (-100 to +100 cents window for visual slider indicator)
-  const clampedCents = Math.max(-100, Math.min(100, centError));
-  // Convert -100..+100 cents to 0..100% position on gauge
-  const gaugePosition = ((clampedCents + 100) / 200) * 100;
 
   // Accessibility: State classification independent of color (distinguishable under deuteranopia/protanopia)
   const isResonant = currentAccuracy >= 90;
@@ -168,7 +216,7 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
         <div
           style={{
             position: 'absolute',
-            left: `${gaugePosition}%`,
+            left: `${smoothGaugePos}%`,
             top: 0,
             bottom: 0,
             width: '8px',
@@ -176,13 +224,14 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
             backgroundColor: activeColor,
             borderRadius: '4px',
             border: '1px solid #ffffff',
+            opacity: currentHz ? 1 : 0.45,
             boxShadow:
               isResonant
                 ? `0 0 16px ${inTuneColor}, 0 0 6px #ffffff`
                 : isNear
                   ? `0 0 10px ${nearTuneColor}`
                   : '0 0 4px rgba(255,255,255,0.4)',
-            transition: 'left 0.15s ease-out, background-color 0.3s ease, box-shadow 0.3s ease',
+            transition: 'background-color 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease',
           }}
         />
       </div>
@@ -247,6 +296,12 @@ export const PitchMeter: React.FC<PitchMeterProps> = ({
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <MicIcon size={16} /> Chant the mantra into your microphone to begin feedback...
           </span>
+        )}
+
+        {therapistTip && (
+          <div style={{ marginTop: '0.5rem', fontSize: '0.82rem', color: '#cbd5e1', fontStyle: 'italic', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.4rem' }}>
+            Therapist Guidance: {therapistTip}
+          </div>
         )}
       </div>
 

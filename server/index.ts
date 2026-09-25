@@ -1,6 +1,7 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { globalStore } from './db/store.js';
 import { generate45DayIcsCalendar } from '../src/utils/calendar.js';
+import { crossCheckVocalMetadata, getReferenceSampleMeta } from './services/voice-therapist.js';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
@@ -266,6 +267,45 @@ export const requestHandler = async (req: IncomingMessage, res: ServerResponse) 
     if (method === 'GET' && pathname === '/api/beta/metrics') {
       const metrics = await globalStore.getBetaMetrics();
       return json(res, 200, metrics);
+    }
+
+    // ── Voice Cross-Checking & Musician-Therapist Matching ──
+
+    // POST /api/voice/cross-check
+    if (method === 'POST' && pathname === '/api/voice/cross-check') {
+      const body = await parseBody(req);
+      if (!body.condition || !['diabetes', 'hypertension', 'thyroid'].includes(body.condition)) {
+        return json(res, 400, { error: 'Valid condition required (diabetes, hypertension, thyroid).' });
+      }
+      if (!body.saNote || !body.saHz) {
+        return json(res, 400, { error: 'saNote and saHz are required for cross-checking.' });
+      }
+
+      const evaluation = crossCheckVocalMetadata({
+        condition: body.condition,
+        saNote: body.saNote,
+        saHz: Number(body.saHz),
+        measuredHz: body.measuredHz ? Number(body.measuredHz) : undefined,
+        averageCentsError: body.averageCentsError !== undefined ? Number(body.averageCentsError) : undefined,
+        voicedDurationSeconds: body.voicedDurationSeconds ? Number(body.voicedDurationSeconds) : undefined,
+        frames: body.frames,
+      });
+
+      return json(res, 200, evaluation);
+    }
+
+    // GET /api/voice/reference-sample
+    if (method === 'GET' && pathname === '/api/voice/reference-sample') {
+      const condition = url.searchParams.get('condition') as any;
+      const saNote = url.searchParams.get('sa') || 'C';
+      const saHz = parseFloat(url.searchParams.get('saHz') || '261.63');
+
+      if (!condition || !['diabetes', 'hypertension', 'thyroid'].includes(condition)) {
+        return json(res, 400, { error: 'Valid condition parameter required (diabetes, hypertension, thyroid).' });
+      }
+
+      const refMeta = getReferenceSampleMeta(condition, saNote, saHz);
+      return json(res, 200, { referenceSample: refMeta });
     }
 
     // 404 Fallback

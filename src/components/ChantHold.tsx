@@ -9,6 +9,8 @@ import { wakeLockManager } from '../utils/wake-lock';
 import { ScreenReaderAnnouncer } from './common/ScreenReaderAnnouncer';
 import { useI18n } from '../i18n/I18nContext';
 import { ChakraBackdrop } from './animations/ChakraBackdrop';
+import { InfoIcon } from './common/Icons';
+import { apiClient } from '../api/client';
 
 interface ChantHoldProps {
   condition: HealthCondition;
@@ -42,42 +44,70 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
   const [currentNote, setCurrentNote] = useState<string>('--');
   const [currentHz, setCurrentHz] = useState<number | undefined>(undefined);
   const [centErr, setCentErr] = useState<number>(0);
+  const [therapistTip, setTherapistTip] = useState<string>('');
 
   const totalAccuraciesRef = useRef<number[]>([]);
   const voicedFramesCountRef = useRef<number>(0);
+  const pitchFramesHistoryRef = useRef<PitchFrame[]>([]);
   const isCompleteRef = useRef(false);
   const engineRef = useRef<AudioEngine | null>(null);
+
+  // Musician-Therapist smoothing & throttle refs
+  const smoothedCentRef = useRef<number>(0);
+  const smoothedHzRef = useRef<number>(targetHz);
+  const lastRenderTimeRef = useRef<number>(0);
 
   useEffect(() => {
     isCompleteRef.current = false;
     remainingRef.current = 600;
     setRemainingSeconds(600);
+    smoothedCentRef.current = 0;
+    smoothedHzRef.current = targetHz;
     wakeLockManager.acquire();
 
     const engine = new AudioEngine({
       onPitchFrame: (frame: PitchFrame) => {
         if (isCompleteRef.current) return;
 
-        if (frame.conf > 0.6 && frame.f0 > 70 && frame.f0 < 800) {
-          const errCents = calcCentError(frame.f0, targetHz);
-          const frameAcc = centToAccuracy(errCents);
+        // Filter out plosives/unvoiced audio
+        if (frame.conf > 0.65 && frame.f0 > 70 && frame.f0 < 800) {
+          const rawErrCents = calcCentError(frame.f0, targetHz);
+          const frameAcc = centToAccuracy(rawErrCents);
 
           totalAccuraciesRef.current.push(frameAcc);
           voicedFramesCountRef.current += 1;
+          pitchFramesHistoryRef.current.push(frame);
 
-          // Note name lookup
-          const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-          const midi = Math.round(69 + 12 * Math.log2(frame.f0 / 440));
-          const noteName = noteNames[((midi % 12) + 12) % 12];
-          const octave = Math.floor(midi / 12) - 1;
-
-          setCurrentNote(`${noteName}${octave}`);
-          setCurrentHz(frame.f0);
-          setCentErr(errCents);
-          setCurrentAccuracy(frameAcc);
+          // Exponential smoothing on cents and frequency (alpha = 0.20)
+          smoothedCentRef.current += (rawErrCents - smoothedCentRef.current) * 0.20;
+          smoothedHzRef.current += (frame.f0 - smoothedHzRef.current) * 0.20;
 
           const currentVoicedSec = voicedFramesCountRef.current * 0.0116;
-          setVoicedSeconds(currentVoicedSec);
+
+          // Throttle UI re-renders to ~33ms (30 FPS)
+          const now = performance.now();
+          if (now - lastRenderTimeRef.current >= 33) {
+            lastRenderTimeRef.current = now;
+
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const midi = Math.round(69 + 12 * Math.log2(smoothedHzRef.current / 440));
+            const noteName = noteNames[((midi % 12) + 12) % 12];
+            const octave = Math.floor(midi / 12) - 1;
+
+            setCurrentNote(`${noteName}${octave}`);
+            setCurrentHz(smoothedHzRef.current);
+            setCentErr(smoothedCentRef.current);
+            setCurrentAccuracy(frameAcc);
+            setVoicedSeconds(currentVoicedSec);
+
+            if (Math.abs(smoothedCentRef.current) <= 18) {
+              setTherapistTip('Resonance lock established. Allow sound to reverberate effortlessly.');
+            } else if (smoothedCentRef.current < -18) {
+              setTherapistTip('Gently float pitch upward without straining throat.');
+            } else {
+              setTherapistTip('Release throat tension and let the tone ease downward.');
+            }
+          }
         }
       }
     });
@@ -119,6 +149,18 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
           totalDurationSeconds: 600,
           completed: true
         };
+
+        // Cross-check session audio metadata against sample set
+        apiClient.crossCheckVoice({
+          condition,
+          saNote,
+          saHz,
+          measuredHz: smoothedHzRef.current,
+          voicedDurationSeconds: totalVoiced,
+          frames: pitchFramesHistoryRef.current,
+        }).catch((err) => {
+          console.warn('[ChantHold] Background voice cross-check sync:', err);
+        });
 
         onHoldPassed(sessionRecord);
       } else {
@@ -187,6 +229,7 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
         currentHz={currentHz}
         centError={centErr}
         label="Live Chanting Pitch Meter"
+        therapistTip={therapistTip}
       />
 
       {/* Voiced Time Progress Bar (FR-9 minimum 50% / 300s required) */}
@@ -208,8 +251,9 @@ export const ChantHold: React.FC<ChantHoldProps> = ({
           />
         </div>
         {!voicedTargetMet && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.4rem' }}>
-            ℹ️ Silent wall-clock time does not count toward session completion. Keep chanting!
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <InfoIcon size={14} color="var(--accent-primary)" />
+            <span>Silent wall-clock time does not count toward session completion. Keep chanting!</span>
           </p>
         )}
       </div>
