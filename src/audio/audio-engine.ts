@@ -309,14 +309,26 @@ export class AudioEngine {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status} loading ${candidate}`);
         }
+        
         const arrayBuffer = await response.arrayBuffer();
-        decoded = await this.audioContext.decodeAudioData(arrayBuffer);
-        if (decoded) {
-          console.info(`[AudioEngine] Successfully loaded and decoded audio: ${candidate} (${decoded.duration.toFixed(2)}s)`);
-          break;
+        
+        if (arrayBuffer instanceof ArrayBuffer && arrayBuffer.byteLength > 0) {
+          try {
+            decoded = await this.audioContext.decodeAudioData(arrayBuffer);
+            if (decoded) {
+              console.info(`[AudioEngine] Successfully loaded and decoded audio: ${candidate} (${decoded.duration.toFixed(2)}s)`);
+              break;
+            }
+          } catch (decodeErr) {
+            const msg = decodeErr instanceof Error ? decodeErr.message : String(decodeErr);
+            throw new Error(`Decoding failed: ${msg}. Ensure file is a valid MP3/WAV/M4A.`);
+          }
+        } else {
+          throw new Error(`Empty or invalid audio buffer received from ${candidate}`);
         }
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
+        console.warn(`[AudioEngine] Failed to load candidate ${candidate}: ${lastError.message}`);
       }
     }
 
