@@ -30,6 +30,7 @@ import { apiClient } from './api/client';
 import { useI18n, LanguageSwitcher } from './i18n/I18nContext';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ChakraBackdrop } from './components/animations/ChakraBackdrop';
+import { LotusIntro, useLotusIntro } from './components/animations/LotusIntro';
 
 import {
   LotusIcon,
@@ -43,6 +44,7 @@ import {
 
 export const App: React.FC = () => {
   const { t } = useI18n();
+  const { shouldShow: showIntro, handleComplete: handleIntroComplete } = useLotusIntro();
 
   // Load and hydrate persisted context and navigation state
   const initialContext = React.useMemo(() => loadPersistedContext(INITIAL_CONTEXT), []);
@@ -86,6 +88,9 @@ export const App: React.FC = () => {
 
   return (
     <ThemeProvider activeCondition={context.selectedCondition}>
+      {/* Lotus Intro — cinematic first-visit animation */}
+      {showIntro && <LotusIntro onComplete={handleIntroComplete} />}
+
       {/* Full-viewport ambient background sitting behind all screens at 60fps */}
       <ChakraBackdrop variant="fullscreen" />
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
