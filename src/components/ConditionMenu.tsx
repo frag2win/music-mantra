@@ -168,10 +168,12 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
                 className="btn-primary"
                 style={{
                   width: '100%',
-                  backgroundColor: chakraTheme.accent,
+                  background: `radial-gradient(ellipse 110% 80% at 50% -20%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 65%), linear-gradient(135deg, ${chakraTheme.accent} 0%, ${chakraTheme.secondaryAccent} 100%)`,
                   color: item.id === 'diabetes' ? '#1c1917' : '#ffffff',
-                  fontWeight: 700,
-                  boxShadow: `0 4px 12px ${chakraTheme.accent}44`,
+                  textShadow: item.id === 'diabetes' ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.4)',
+                  boxShadow: `0 4px 20px -2px ${chakraTheme.accentSoft}, 0 0 28px -4px ${chakraTheme.accentSoft}`,
+                  border: '1px solid rgba(255, 255, 255, 0.35)',
+                  padding: '0.85rem 1.5rem',
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -191,7 +193,7 @@ export const ConditionMenu: React.FC<ConditionMenuProps> = ({
             type="button"
             className="btn-secondary"
             onClick={onBack}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.65rem 1.5rem', fontSize: '0.95rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
           >
             <ArrowLeftIcon size={16} /> Back to Scale Tuning
           </button>

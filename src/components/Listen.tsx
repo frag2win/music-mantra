@@ -160,13 +160,12 @@ export const Listen: React.FC<ListenProps> = ({
 
         {/* Play/Stop Button */}
         <button
-          className="btn-primary"
+          className={isPlaying ? 'btn-danger' : 'btn-primary'}
           style={{
-            fontSize: '1.15rem',
-            padding: '0.9rem 2.5rem',
-            backgroundColor: isPlaying ? 'var(--danger)' : 'var(--chakra-theme-accent, var(--accent-primary))',
+            fontSize: '1.1rem',
+            padding: '0.95rem 2.6rem',
             color: isPlaying ? '#ffffff' : (condition === 'diabetes' ? '#1c1917' : '#ffffff'),
-            fontWeight: 700,
+            textShadow: (!isPlaying && condition === 'diabetes') ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.4)',
           }}
           onClick={handleTogglePlayback}
           disabled={isLoading}
@@ -210,15 +209,15 @@ export const Listen: React.FC<ListenProps> = ({
         <span>{t('listen.halfDuplex')}</span>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           className="btn-primary"
-          style={{ fontSize: '1.1rem', padding: '1rem 2.5rem' }}
+          style={{ fontSize: '1.05rem', padding: '0.95rem 2.6rem' }}
           onClick={handleGoAhead}
         >
           {t('listen.goAheadBtn')}
         </button>
-        <button className="btn-secondary" onClick={handleBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+        <button className="btn-secondary" onClick={handleBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
           <ArrowLeftIcon size={16} /> {t('listen.changeConditionBtn')}
         </button>
       </div>

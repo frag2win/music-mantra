@@ -136,27 +136,29 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
           display: 'inline-flex',
           alignItems: 'center',
           gap: '0.45rem',
-          background: isOpen ? 'rgba(30, 41, 59, 0.95)' : 'rgba(30, 41, 59, 0.75)',
-          padding: '0.35rem 0.65rem',
+          background: isOpen ? 'rgba(30, 41, 59, 0.9)' : 'rgba(15, 23, 42, 0.75)',
+          padding: '0.42rem 0.85rem',
           borderRadius: '9999px',
-          border: '1px solid rgba(148, 163, 184, 0.25)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
           color: 'var(--text-primary)',
           fontSize: '0.82rem',
           fontWeight: 600,
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          backdropFilter: 'blur(10px)',
-          boxShadow: isOpen ? '0 0 12px rgba(99, 102, 241, 0.3)' : '0 1px 4px rgba(0, 0, 0, 0.2)',
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          backdropFilter: 'blur(16px)',
+          boxShadow: isOpen
+            ? '0 0 16px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.3)), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+            : '0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)',
         }}
       >
-        <GlobeIcon size={14} color="var(--accent-primary)" />
+        <GlobeIcon size={14} color="var(--chakra-theme-accent, var(--accent-primary))" />
         <span>{currentLang.nativeName}</span>
         <ChevronDownIcon
           size={12}
           color="var(--text-secondary)"
           style={{
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
+            transition: 'transform 0.3s ease',
           }}
         />
       </button>
@@ -166,20 +168,20 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
           role="listbox"
           style={{
             position: 'absolute',
-            top: 'calc(100% + 6px)',
+            top: 'calc(100% + 8px)',
             right: 0,
-            minWidth: '150px',
-            background: 'rgba(15, 23, 42, 0.95)',
-            border: '1px solid rgba(148, 163, 184, 0.25)',
-            borderRadius: '12px',
-            boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(99, 102, 241, 0.15)',
-            backdropFilter: 'blur(16px)',
-            padding: '0.35rem',
+            minWidth: '160px',
+            background: 'rgba(15, 23, 42, 0.9)',
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            borderRadius: '16px',
+            boxShadow: '0 12px 36px -4px rgba(0, 0, 0, 0.6), 0 0 20px var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.15))',
+            backdropFilter: 'blur(20px)',
+            padding: '0.45rem',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'column',
-            gap: '0.2rem',
-            animation: 'fadeInMenu 0.15s ease-out',
+            gap: '0.25rem',
+            animation: 'fadeInMenu 0.2s ease-out',
           }}
         >
           {languages.map((item) => {
@@ -198,26 +200,26 @@ export const LanguageSwitcher: React.FC<{ className?: string }> = ({ className }
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '0.45rem 0.75rem',
-                  borderRadius: '8px',
+                  padding: '0.5rem 0.85rem',
+                  borderRadius: '9999px',
                   border: 'none',
-                  background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                  color: isSelected ? 'var(--accent-primary)' : 'var(--text-primary)',
+                  background: isSelected ? 'var(--chakra-theme-accent-soft, rgba(245, 158, 11, 0.2))' : 'transparent',
+                  color: isSelected ? 'var(--chakra-theme-accent, #f59e0b)' : 'var(--text-primary)',
                   fontSize: '0.82rem',
                   fontWeight: isSelected ? 700 : 500,
                   cursor: 'pointer',
                   textAlign: 'left',
-                  transition: 'background 0.15s ease, color 0.15s ease',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  if (!isSelected) (e.currentTarget.style.background = 'rgba(51, 65, 85, 0.5)');
+                  if (!isSelected) (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)');
                 }}
                 onMouseLeave={(e) => {
                   if (!isSelected) (e.currentTarget.style.background = 'transparent');
                 }}
               >
                 <span>{item.nativeName} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>({item.label})</span></span>
-                {isSelected && <CheckIcon size={14} color="var(--accent-primary)" />}
+                {isSelected && <CheckIcon size={14} color="var(--chakra-theme-accent, var(--accent-primary))" />}
               </button>
             );
           })}

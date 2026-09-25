@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { apiClient } from '../api/client';
 import { useI18n } from '../i18n/I18nContext';
-import { CheckCircleIcon, CalendarIcon } from './common/Icons';
+import { CheckCircleIcon, CalendarIcon, LotusIcon } from './common/Icons';
 
 interface WelcomeProps {
   activeDay: number;
@@ -92,15 +92,16 @@ export const Welcome: React.FC<WelcomeProps> = ({
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
           className="btn-primary"
-          style={{ fontSize: '1.1rem', padding: '1rem 2rem' }}
+          style={{ fontSize: '1.05rem', padding: '0.95rem 2.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}
           disabled={!disclaimerAccepted}
           onClick={onStartProgram}
         >
-          Begin Today's Practice (Day {activeDay})
+          <LotusIcon size={20} color="#ffffff" />
+          <span>Begin Today's Practice (Day {activeDay})</span>
         </button>
         <button
           className="btn-secondary"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
           onClick={() => {
             apiClient.downloadCalendar('Swara Healing 45-Day Program');
           }}

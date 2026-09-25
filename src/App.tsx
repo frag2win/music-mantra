@@ -100,22 +100,6 @@ export const App: React.FC = () => {
               onClick={handleGoBack}
               aria-label={getBackDestinationTitle(String(state), context)}
               title={getBackDestinationTitle(String(state), context)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                background: 'rgba(30, 41, 59, 0.85)',
-                border: '1px solid rgba(148, 163, 184, 0.3)',
-                color: 'var(--text-primary)',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '8px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-                backdropFilter: 'blur(8px)'
-              }}
             >
               <ArrowLeftIcon size={16} />
               <span>{getBackDestinationTitle(String(state), context)}</span>

@@ -156,15 +156,15 @@ export const ScaleResult: React.FC<ScaleResultProps> = ({
         </label>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-        <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }} onClick={onConfirmScale}>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.9rem 2.2rem' }} onClick={onConfirmScale}>
           Confirm Key & Pick Mantra
         </button>
         <button className="btn-secondary" onClick={onRetrySinging}>
           Re-sing Song
         </button>
         {onBack && (
-          <button className="btn-secondary" onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+          <button className="btn-secondary" onClick={onBack} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeftIcon size={16} /> Back
           </button>
         )}
