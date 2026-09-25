@@ -5,6 +5,43 @@
 
 ---
 
+## Phase 1: Application Flow & UI Implementation
+**Date:** 25 Sep 2026
+**Author:** Antigravity AI
+
+### Summary
+Implemented the complete Phase 1 application flow as specified in [TRD-swara-healing-web.md](DOCS/TRD-swara-healing-web.md) and [BUILDING-PLAN.md](DOCS/BUILDING-PLAN.md). Built the XState v5 application state machine, 10 UI screens, accessible pitch meter component, domain types, and Playwright end-to-end testing suite.
+
+### What Changed
+
+#### ⚙️ Application State Machine (`src/machine/app-machine.ts`)
+- Defined 13 explicit application states (`welcome`, `mic_permission`, `calibrate`, `sing`, `scale_result`, `menu`, `listen`, `chant_eval`, `retry`, `chant_hold`, `retry_short`, `session_done`, `history`, `paused`).
+- Enforced medical disclaimer guard condition before starting program.
+- Managed session counters, active day index (1..45), manual Sa overrides, and history array persistence.
+
+#### 🎨 UI Screen Components (`src/components/`)
+| File | Screen / Role |
+|---|---|
+| `Welcome.tsx` | Welcome screen with Day N/45 progress ring, medical disclaimer modal (FR-1), and Begin/History buttons |
+| `Calibrate.tsx` | 3-second ambient noise calibration screen with animated progress bar and noise level meter |
+| `Sing.tsx` | Key capture screen with 15-second countdown, live pitch readout, and ≥3s voiced frames gate (FR-2) |
+| `ScaleResult.tsx` | Detected scale & tonic (Sa) display, confidence level, 12-note manual Sa override picker, and `sa_hold` toggle (FR-3) |
+| `ConditionMenu.tsx` | 3 Chakra condition cards: Diabetes (Manipura/Ga/Ram), Thyroid (Vishuddha/Pa/Ham), Hypertension (Anahata/Ma/Yam) (FR-4) |
+| `Listen.tsx` | Reference mantra loop player with half-duplex safety guarantee (FR-5 & FR-6) |
+| `ChantEval.tsx` | 7.5-second evaluation gate screen with rolling 2s accuracy display (≥90% pass target) (FR-7 & FR-8) |
+| `ChantHold.tsx` | 10-minute hold countdown timer with screen wake lock and ≥50% (300s) voiced time accounting (FR-9) |
+| `SessionDone.tsx` | Session completion celebration screen with FR-10 requirement copy and session statistics |
+| `History.tsx` | Session history log table with date, condition, Sa key, and evaluation/mean accuracy (FR-11) |
+| `Retry.tsx` & `RetryShort.tsx` | Retry prompt screens for evaluation failure and insufficient voiced time |
+| `common/PitchMeter.tsx` | WCAG 2.1 AA accessible visual pitch accuracy meter with target/sung note, cent gauge, and rate-limited `aria-live` region |
+
+#### 🧪 Tests & Build Validation
+- Unit tests: Added `tests/unit/app-machine.test.ts` (6 tests). Total 55 passing Vitest unit tests.
+- E2E tests: Added `tests/e2e/app-flow.spec.ts` and `playwright.config.ts` for Chromium fake-audio testing.
+- Type Safety & Linting: Clean TypeScript `tsc -b` compilation and 0 OxLint errors.
+
+---
+
 ## [4672047] — Phase 0: DSP Core Implementation
 **Date:** 24 Sep 2026, 22:52 IST
 **Author:** Shubham Pawar
